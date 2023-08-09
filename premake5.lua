@@ -18,6 +18,8 @@ project "GameEngine"
     location "GameEngine"
     kind "SharedLib"
     language "C++"
+    runtime "Debug"
+
 
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -41,9 +43,13 @@ project "GameEngine"
         "opengl32.lib"
     }
 
+    postbuildcommands{
+        ("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/Sandbox")
+    }
+
     filter "system:windows"
         cppdialect "C++17"
-        staticruntime "On"
+        staticruntime "Off"
         systemversion "latest"
 
         defines{
@@ -53,6 +59,7 @@ project "GameEngine"
         }
     filter "configurations:Debug"
         defines "EG_DEBUG"
+        --buildoptions "/MDd"
         symbols "On"
     filter "configurations:Release"
         defines "EG_RELEASE"
