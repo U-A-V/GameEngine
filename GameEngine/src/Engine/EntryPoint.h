@@ -3,7 +3,12 @@
 
 extern Engine::Application* Engine::CreateApplication();
 int main(int argc, char** argv) {
-	printf("Engine started");
+
+	Engine::Log::init();
+	EG_CORE_WARN("Initialize Log!");
+	int a = 5;
+	EG_CLIENT_INFO("Hp :{0}",a);
+
 	auto app = Engine::CreateApplication();
 	app->Run();
 	delete app;
