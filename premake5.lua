@@ -11,14 +11,17 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
 IncludeDir = {}
 IncludeDir["GLFW"] = "GameEngine/vendor/GLFW/include"
+IncludeDir["Glad"] = "GameEngine/vendor/Glad/include"
+IncludeDir["imgui"] = "GameEngine/vendor/imgui"
 
 include "GameEngine/vendor/GLFW"
+include "GameEngine/vendor/Glad"
+include "GameEngine/vendor/imgui"
 
 project "GameEngine"
     location "GameEngine"
     kind "SharedLib"
     language "C++"
-    runtime "Debug"
 
 
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
@@ -35,11 +38,15 @@ project "GameEngine"
     includedirs {
         "%{prj.name}/src",
         "%{prj.name}/vendor/spdlog/include",
-        "%{IncludeDir.GLFW}"
+        "%{IncludeDir.GLFW}",
+        "%{IncludeDir.Glad}",
+        "%{IncludeDir.imgui}",
     }
 
     links{
         "GLFW",
+        "Glad",
+        "imgui",
         "opengl32.lib"
     }
 
@@ -49,24 +56,29 @@ project "GameEngine"
 
     filter "system:windows"
         cppdialect "C++17"
-        staticruntime "Off"
+        staticruntime "On"
         systemversion "latest"
 
         defines{
 
             "EG_PLATFORM_WINDOWS",
-            "EG_BUILD_DLL"
+            "EG_BUILD_DLL",
+            "GLFW_INCLUDE_NONE"
         }
     filter "configurations:Debug"
         defines "EG_DEBUG"
-        --buildoptions "/MDd"
+        buildoptions "/MDd"
         symbols "On"
     filter "configurations:Release"
         defines "EG_RELEASE"
         optimize "On"
+        buildoptions "/MD"
+
     filter "configurations:Dist"
         defines "EG_DIST"
         optimize "On"
+        buildoptions "/MD"
+
 
 project "sandBox"
     location "sandBox"
@@ -101,9 +113,14 @@ project "sandBox"
     filter "configurations:Debug"
         defines "EG_DEBUG"
         symbols "On"
+        buildoptions "/MDd"
+
     filter "configurations:Release"
         defines "EG_RELEASE"
         optimize "On"
+        buildoptions "/MD"
+
     filter "configurations:Dist"
         defines "EG_DIST"
         optimize "On"
+        buildoptions "/MD"
