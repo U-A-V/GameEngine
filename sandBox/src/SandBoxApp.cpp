@@ -10,7 +10,7 @@ public:
 		//EG_CLIENT_INFO("ExampleLayer::Update");
 	}
 	void OnEvent(Engine::Event& event) override {
-		EG_CLIENT_TRACE("{0}", event);
+		//EG_CLIENT_TRACE("{0}", event);
 	}
 };
 
