@@ -1,5 +1,6 @@
 #include "hzpch.h"
 #include "Application.h"
+#include "Input.h"
 
 
 #include <glad/glad.h>
@@ -45,6 +46,9 @@ namespace Engine {
 
 		while (m_Running) {
 			for (Layer* layer : m_LayerStack)	layer->OnUpdate();
+
+			auto [x, y] = Input::GetMousePosition();
+			EG_CORE_TRACE("{0}, {1}", x, y);
 			m_Window->OnUpdate();
 		}
 	}

@@ -9,6 +9,10 @@
 	#error Engine only support Windows!!
 #endif
 
+#ifdef EG_BUILD
+#define EG_ENABLE_ASSERTS
+#endif
+
 #ifdef EG_ENABLE_ASSERTS
 #define EG_ASSERT(x, ...) {if(!(x)){EG_ERROR("Assertion Faild: {0}", __VA_ARGS__); __debugbreak();}}
 #define EG_CORE_ASSERT(x, ...) {if(!(x)){EG_CORE_ERROR("Assertion Failed: {0}",__VA_ARGS__); __debugbreak();}}

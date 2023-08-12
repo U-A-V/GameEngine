@@ -22,6 +22,7 @@ project "GameEngine"
     location "GameEngine"
     kind "SharedLib"
     language "C++"
+    staticruntime "Off"
 
 
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
@@ -51,12 +52,11 @@ project "GameEngine"
     }
 
     postbuildcommands{
-        ("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/Sandbox")
+        ("{COPY} %{cfg.buildtarget.relpath} \"../bin/" .. outputdir .. "/Sandbox/\"")
     }
 
     filter "system:windows"
         cppdialect "C++17"
-        staticruntime "On"
         systemversion "latest"
 
         defines{
@@ -67,23 +67,24 @@ project "GameEngine"
         }
     filter "configurations:Debug"
         defines "EG_DEBUG"
-        buildoptions "/MDd"
         symbols "On"
+        runtime "Debug"
     filter "configurations:Release"
         defines "EG_RELEASE"
         optimize "On"
-        buildoptions "/MD"
-
+        runtime "Release"
     filter "configurations:Dist"
         defines "EG_DIST"
         optimize "On"
-        buildoptions "/MD"
+        runtime "Release"
+        
 
 
 project "sandBox"
     location "sandBox"
     kind "ConsoleApp"
     language "C++"
+    staticruntime "Off"
 
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -103,7 +104,6 @@ project "sandBox"
     }
     filter "system:windows"
         cppdialect "C++17"
-        staticruntime "On"
         systemversion "latest"
 
         defines{
@@ -113,14 +113,14 @@ project "sandBox"
     filter "configurations:Debug"
         defines "EG_DEBUG"
         symbols "On"
-        buildoptions "/MDd"
+        runtime "Debug"
 
     filter "configurations:Release"
         defines "EG_RELEASE"
         optimize "On"
-        buildoptions "/MD"
+        runtime "Release"
 
     filter "configurations:Dist"
         defines "EG_DIST"
         optimize "On"
-        buildoptions "/MD"
+        runtime "Release"
