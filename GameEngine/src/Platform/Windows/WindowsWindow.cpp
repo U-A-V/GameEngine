@@ -5,8 +5,8 @@
 #include "Engine/Events/MouseEvent.h"
 #include "Engine/Events/ApplicatonEvent.h"
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+#include "Platform/OpenGL/OpenGLContext.h"
+
 
 namespace Engine {
 	static bool s_GLFWinitialized = false;
@@ -31,6 +31,7 @@ namespace Engine {
 
 		EG_CORE_INFO("Creating window {0} ({1}, {2})", props.Title, props.Width, props.Height);
 
+
 		if (!s_GLFWinitialized) {
 			int success = glfwInit();
 			EG_CORE_ASSERT(success, "Could not initialize GLFW!!");
@@ -38,9 +39,10 @@ namespace Engine {
 			s_GLFWinitialized = true;
 		}
 		m_Window = glfwCreateWindow((int)props.Width, (int)props.Height, m_Data.Title.c_str(), nullptr, nullptr);
-		glfwMakeContextCurrent(m_Window);
-		int status = gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
-		EG_CORE_ASSERT(status, "Failed to initialize Glad!!");
+		m_Context = new OpenGLContext(m_Window);
+
+		m_Context->Init();
+
 		glfwSetWindowUserPointer(m_Window, &m_Data);
 		SetVSync(true);
 
@@ -121,7 +123,7 @@ namespace Engine {
 
 	void WindowsWindow::OnUpdate() {
 		glfwPollEvents();
-		glfwSwapBuffers(m_Window);
+		m_Context->SwapBuffers();
 	}
 	
 	void WindowsWindow::SetVSync(bool enabled) {

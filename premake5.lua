@@ -21,9 +21,10 @@ include "GameEngine/vendor/imgui"
 
 project "GameEngine"
     location "GameEngine"
-    kind "SharedLib"
+    kind "StaticLib"
     language "C++"
-    staticruntime "Off"
+    cppdialect "C++17"
+    staticruntime "on"
 
 
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
@@ -55,12 +56,7 @@ project "GameEngine"
         "opengl32.lib"
     }
 
-    postbuildcommands{
-        ("{COPY} %{cfg.buildtarget.relpath} \"../bin/" .. outputdir .. "/Sandbox/\"")
-    }
-
     filter "system:windows"
-        cppdialect "C++17"
         systemversion "latest"
 
         defines{
@@ -71,15 +67,15 @@ project "GameEngine"
         }
     filter "configurations:Debug"
         defines "EG_DEBUG"
-        symbols "On"
+        symbols "on"
         runtime "Debug"
     filter "configurations:Release"
         defines "EG_RELEASE"
-        optimize "On"
+        optimize "on"
         runtime "Release"
     filter "configurations:Dist"
         defines "EG_DIST"
-        optimize "On"
+        optimize "on"
         runtime "Release"
         
 
@@ -88,7 +84,8 @@ project "sandBox"
     location "sandBox"
     kind "ConsoleApp"
     language "C++"
-    staticruntime "Off"
+    cppdialect "C++17"
+    staticruntime "on"
 
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -110,7 +107,6 @@ project "sandBox"
         "GameEngine"
     }
     filter "system:windows"
-        cppdialect "C++17"
         systemversion "latest"
 
         defines{
@@ -119,15 +115,15 @@ project "sandBox"
         }
     filter "configurations:Debug"
         defines "EG_DEBUG"
-        symbols "On"
+        symbols "on"
         runtime "Debug"
 
     filter "configurations:Release"
         defines "EG_RELEASE"
-        optimize "On"
+        optimize "on"
         runtime "Release"
 
     filter "configurations:Dist"
         defines "EG_DIST"
-        optimize "On"
+        optimize "on"
         runtime "Release"

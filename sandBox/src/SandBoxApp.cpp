@@ -18,7 +18,6 @@ class Sandbox : public Engine::Application {
 public:
 	Sandbox() {
 		PushLayer(new ExampleLayer());
-		PushLayer(new Engine::imGuiLayer());
 	}
 	~Sandbox() {
 
