@@ -154,6 +154,7 @@
     <ClInclude Include="src\Engine\LayerStack.h" />
     <ClInclude Include="src\Engine\Log.h" />
     <ClInclude Include="src\Engine\MouseButtonCodes.h" />
+    <ClInclude Include="src\Engine\Renderer\Shader.h" />
     <ClInclude Include="src\Engine\Window.h" />
     <ClInclude Include="src\Engine\imGui\imGuiLayer.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h" />
@@ -585,6 +586,7 @@
     <ClCompile Include="src\Engine\Log.cpp" />
     <ClCompile Include="src\Engine\imGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\Engine\imGui\imGuiLayer.cpp" />
+    <ClCompile Include="src\Engine\Renderer\Shader.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLContext.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsInput.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp" />
