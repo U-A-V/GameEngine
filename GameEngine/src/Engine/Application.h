@@ -9,6 +9,8 @@
 #include "Engine/imGui/imGuiLayer.h"
 
 #include "Engine/Renderer/Shader.h"
+#include "Engine/Renderer/Buffer.h"
+#include "Engine/Renderer/VertexArray.h"
 
 namespace Engine {
 
@@ -33,8 +35,11 @@ namespace Engine {
 		bool m_Running= true;
 		LayerStack m_LayerStack;
 
-		unsigned int m_VertexArray, m_VertexBuffer, m_IndexBuffer;
-		std::unique_ptr<Shader> m_Shader;
+		std::shared_ptr<Shader> m_Shader;
+		std::shared_ptr<VertexArray> m_VertexArray;
+
+		std::shared_ptr<Shader> m_SquareShader;
+		std::shared_ptr<VertexArray> m_SquareVA;
 	private:
 		static Application* s_Instance;
 	};

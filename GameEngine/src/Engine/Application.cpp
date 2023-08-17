@@ -11,6 +11,7 @@ namespace Engine {
 #define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
 
 	Application* Application::s_Instance = nullptr;
+
 	Application::Application() {
 		EG_CORE_ASSERT(s_Instance, "Application already exists!");
 		s_Instance = this;
@@ -20,32 +21,85 @@ namespace Engine {
 		m_ImGuiLayer = new imGuiLayer();
 		PushOverlay(m_ImGuiLayer);
 
-		glGenVertexArrays(1, &m_VertexArray);
-		glBindVertexArray(m_VertexArray);
+		m_VertexArray.reset(VertexArray::Create());
 
-		glGenBuffers(1, &m_VertexBuffer);
-		glBindBuffer(GL_ARRAY_BUFFER, m_VertexBuffer);
-
-		float vertices[3 * 3] = {
-			-0.5f,	-0.5f,	0.0f,
-			0.5f,	-0.5f,	0.0f,
-			0.0f,	0.5f,	0.0f
+		float vertices[3 * 7] = {
+				//Position						//Color
+			-0.5f,	-0.5f,	0.0f,		0.8f,	0.2f,	0.8f,	1.0f,
+			0.5f,	-0.5f,	0.0f,		0.2f,	0.3f,	0.8f,	1.0f,
+			0.0f,	0.5f,	0.0f,		0.8f,	0.8f,	0.2f,	1.0f,
 		};
+		std::shared_ptr<VertexBuffer> m_VertexBuffer;
+		m_VertexBuffer.reset(VertexBuffer::Create(vertices,sizeof(vertices)));
 
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+		BufferLayout layout = {
+			{ShaderDataType::Float3, "a_Position" },
+			{ShaderDataType::Float4, "a_Color"},
 
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), nullptr);
-
-		glGenBuffers(1, &m_IndexBuffer);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IndexBuffer);
+		};
+		m_VertexBuffer->SetLayout(layout);
+		m_VertexArray->AddVertexBuffer(m_VertexBuffer);
 
 		unsigned int indices[3] = {
 			0,	1,	2
 		};
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+		std::shared_ptr<IndexBuffer> m_IndexBuffer;
+		m_IndexBuffer.reset(IndexBuffer::Create(indices, sizeof(indices)/sizeof(uint32_t)));
+		m_VertexArray->SetIndexBuffer(m_IndexBuffer);
+
+		m_SquareVA.reset(VertexArray::Create());
+		float squareVertices[4 * 3] = {
+			-0.5f,	-0.5f,	0.0f,
+			0.5f,	-0.5f,	0.0f,
+			0.5f,	0.5f,	0.0f,
+			-0.5f,	0.5f,	0.0f,
+		};
+		std::shared_ptr<VertexBuffer> squareVB;
+		squareVB.reset(VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
+
+		BufferLayout squareLayout = {
+			{ShaderDataType::Float3, "a_Position"}
+		};
+
+		squareVB->SetLayout(squareLayout);
+		m_SquareVA->AddVertexBuffer(squareVB);
+
+
+		unsigned int squareIndices[3 * 2] = {
+			0,	1,	2,
+			0,	2,	3,
+		};
+
+		std::shared_ptr<IndexBuffer> squareIB;
+		squareIB.reset(IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t)));
+		m_SquareVA->SetIndexBuffer(squareIB);
+
 
 		std::string vertexSrc =R"(
+			#version 330 core
+			layout(location=0) in vec3 a_Position;
+			layout(location=1) in vec4 a_Color;
+			out vec3 v_Position;
+			out vec4 v_Color;
+			void main(){
+				v_Position=a_Position;
+				v_Color=a_Color;
+				gl_Position = vec4(a_Position,1.0);
+			}
+		)";
+		std::string fragmentSrc =R"(
+			#version 330 core
+			layout(location=0) out vec4 color;
+			in vec3 v_Position;
+			in vec4 v_Color;
+			void main(){
+				color=v_Color;
+			}
+		)";
+
+		m_Shader.reset(new Shader(vertexSrc,fragmentSrc));
+
+		std::string vertexSrcSq =R"(
 			#version 330 core
 			layout(location=0) in vec3 a_Position;
 			out vec3 v_Position;
@@ -54,7 +108,7 @@ namespace Engine {
 				gl_Position = vec4(a_Position,1.0);
 			}
 		)";
-		std::string fragmentSrc =R"(
+		std::string fragmentSrcSq =R"(
 			#version 330 core
 			layout(location=0) out vec4 color;
 			in vec3 v_Position;
@@ -63,7 +117,7 @@ namespace Engine {
 			}
 		)";
 
-		m_Shader.reset(new Shader(vertexSrc,fragmentSrc));
+		m_SquareShader.reset(new Shader(vertexSrcSq,fragmentSrcSq));
 
 	}
 	Application::~Application() {
@@ -97,9 +151,14 @@ namespace Engine {
 			glClear(GL_COLOR_BUFFER_BIT);
 
 			//glUseProgram(0);
+			m_SquareShader->Bind();
+			m_SquareVA->Bind();
+			glDrawElements(GL_TRIANGLES, m_SquareVA->GetIndexBuffers()->GetCount(), GL_UNSIGNED_INT, nullptr);
+
 			m_Shader->Bind();
-			glBindVertexArray(m_VertexArray);
-			glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, nullptr);
+			m_VertexArray->Bind();
+			glDrawElements(GL_TRIANGLES, m_VertexArray->GetIndexBuffers()->GetCount(), GL_UNSIGNED_INT, nullptr);
+
 			for (Layer* layer : m_LayerStack)	layer->OnUpdate();
 
 			auto [x, y] = Input::GetMousePosition();
