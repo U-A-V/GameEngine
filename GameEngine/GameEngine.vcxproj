@@ -143,6 +143,7 @@
     <ClInclude Include="src\Engine.h" />
     <ClInclude Include="src\Engine\Application.h" />
     <ClInclude Include="src\Engine\Core.h" />
+    <ClInclude Include="src\Engine\Core\TimeStamp.h" />
     <ClInclude Include="src\Engine\EntryPoint.h" />
     <ClInclude Include="src\Engine\Events\ApplicatonEvent.h" />
     <ClInclude Include="src\Engine\Events\Event.h" />

@@ -1,7 +1,7 @@
 #pragma once
 #include "Engine/Core.h"
 #include "Engine/Events/Event.h"
-
+#include "Engine/Core/TimeStamp.h"
 namespace Engine {
 
 	class ENGINE_API Layer{
@@ -11,7 +11,7 @@ namespace Engine {
 
 		virtual void OnAttach(){}
 		virtual void OnDetach(){}
-		virtual void OnUpdate(){}
+		virtual void OnUpdate(TimeStamp time){}
 		virtual void OnImGuiRender(){}
 		virtual void OnEvent(Event& event){}
 		

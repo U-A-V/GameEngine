@@ -4,7 +4,7 @@
 
 #include "Engine/Renderer/Renderer.h"
 
-
+#include <GLFW/glfw3.h>
 
 namespace Engine {
 
@@ -52,8 +52,10 @@ namespace Engine {
 
 		while (m_Running) {
 
-
-			for (Layer* layer : m_LayerStack)	layer->OnUpdate();
+			float time = (float)glfwGetTime(); // Platform::GetTime()
+			TimeStamp timestep = time - m_LastFrameTime;
+			m_LastFrameTime = time;
+			for (Layer* layer : m_LayerStack)	layer->OnUpdate(timestep);
 
 			auto [x, y] = Input::GetMousePosition();
 			//EG_CORE_TRACE("{0}, {1}", x, y);

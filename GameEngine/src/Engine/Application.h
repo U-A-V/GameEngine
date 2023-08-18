@@ -14,6 +14,8 @@
 
 #include "Engine/Renderer/OrthographicCamera.h"
 
+#include "Engine/Core/TimeStamp.h"
+
 namespace Engine {
 
 	class ENGINE_API Application{
@@ -32,11 +34,12 @@ namespace Engine {
 		inline Window& GetWindow() { return *m_Window; }
 	private:
 		bool OnWindowClose(WindowCloseEvent& e);
+	private:
 		std::unique_ptr<Window> m_Window;
 		imGuiLayer* m_ImGuiLayer;
 		bool m_Running= true;
 		LayerStack m_LayerStack;
-
+		float m_LastFrameTime = 0.0f;
 	private:
 		static Application* s_Instance;
 	};
