@@ -100,6 +100,7 @@ project "sandBox"
         "GameEngine/vendor/spdlog/include",
         "GameEngine/src",
         "%{IncludeDir.glm}",
+        "%{IncludeDir.imgui}"
 
     }
 

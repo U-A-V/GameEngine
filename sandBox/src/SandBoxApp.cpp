@@ -1,6 +1,11 @@
 #include <Engine.h>
+#include "Platform/OpenGL/OpenGLShader.h"
+
+#include "imgui.h"
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 class ExampleLayer : public Engine::Layer {
 public:
 	ExampleLayer()
@@ -86,7 +91,7 @@ public:
 			}
 		)";
 
-		m_Shader.reset(new Engine::Shader(vertexSrc, fragmentSrc));
+		m_Shader.reset(Engine::Shader::Create(vertexSrc, fragmentSrc));
 
 		std::string vertexSrcSq = R"(
 			#version 330 core
@@ -105,12 +110,15 @@ public:
 			#version 330 core
 			layout(location=0) out vec4 color;
 			in vec3 v_Position;
+			
+			uniform vec4 u_Color;
+
 			void main(){
-				color=vec4(v_Position*0.5+0.5,1.0);
+				color=u_Color;
 			}
 		)";
 
-		m_SquareShader.reset(new Engine::Shader(vertexSrcSq, fragmentSrcSq));
+		m_FlatColorShader.reset(Engine::Shader::Create(vertexSrcSq, fragmentSrcSq));
 
 	}
 	void OnUpdate(Engine::TimeStamp ts) override {
@@ -140,18 +148,26 @@ public:
 		Engine::Renderer::BeginScene(m_Camera);
 
 		static glm::mat4 scale = glm::scale(glm::mat4(1.0f), glm::vec3(0.1f));
+
+		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_FlatColorShader)->Bind();
+		std::dynamic_pointer_cast<Engine::OpenGLShader>(m_FlatColorShader)->UploadUniformFloat4(m_squareColor,"u_Color");
 		for (int j = 0; j < 20; j++) {
 
 			for (int i = 0; i < 20; i++) {
 				glm::vec3 pos(i * 0.11f,j* 0.11f, 0.0f);
 				glm::mat4 transform = glm::translate(glm::mat4(1.0f),pos)*scale;
-				Engine::Renderer::Submit(m_SquareShader, m_SquareVA, transform);
+				Engine::Renderer::Submit(m_FlatColorShader, m_SquareVA, transform);
 			}
 		}
 
-		//Engine::Renderer::Submit(m_Shader, m_VertexArray);
+		Engine::Renderer::Submit(m_Shader, m_VertexArray); 
 
 		Engine::Renderer::EndScene();
+	}
+	virtual void OnImGuiRender() override {
+		ImGui::Begin("Settings");
+		ImGui::ColorEdit4("Square Color", glm::value_ptr(m_squareColor));
+		ImGui::End();
 	}
 	void OnEvent(Engine::Event& event) override {
 
@@ -162,7 +178,7 @@ private:
 	std::shared_ptr<Engine::Shader> m_Shader;
 	std::shared_ptr<Engine::VertexArray> m_VertexArray;
 
-	std::shared_ptr<Engine::Shader> m_SquareShader;
+	std::shared_ptr<Engine::Shader> m_FlatColorShader;
 	std::shared_ptr<Engine::VertexArray> m_SquareVA;
 
 	Engine::OrthographicCamera m_Camera;
@@ -172,7 +188,7 @@ private:
 	float m_CameraRotation=0.0f;
 	float m_CameraRotationSpeed=45.0f;
 
-
+	glm::vec4 m_squareColor={ 0.2f,0.3f,0.8f,1.0f };
 };
 
 class Sandbox : public Engine::Application {
