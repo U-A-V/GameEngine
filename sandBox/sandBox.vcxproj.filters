@@ -23,5 +23,8 @@
     <Image Include="assets\textures\Checkerboard.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="assets\textures\youtube-logo.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

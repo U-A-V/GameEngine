@@ -5,6 +5,10 @@
 #include "Platform/OpenGL/OpenGLShader.h"
 
 namespace Engine {
+	void Renderer::Init() {
+		RenderCommand::Init();
+	}
+
 	Renderer::SceneData* Renderer::m_SceneData = new Renderer::SceneData;
 	void Renderer::BeginScene(OrthographicCamera& camera){
 		m_SceneData->ViewProjectionMatrix = camera.GetViewProjectionMatrix();

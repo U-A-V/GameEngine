@@ -7,7 +7,7 @@ namespace Engine {
 		virtual uint32_t GetHeight() const = 0;
 
 
-		virtual void Bind(uint32_t slot) const = 0;
+		virtual void Bind(uint32_t slot=0) const = 0;
 	private:
 
 	};
