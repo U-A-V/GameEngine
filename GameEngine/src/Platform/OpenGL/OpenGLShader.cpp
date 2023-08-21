@@ -5,6 +5,7 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+
 namespace Engine {
 	static GLenum ShaderTypeFromString(const std::string& type) {
 		if (type == "vertex")	return GL_VERTEX_SHADER;
@@ -18,9 +19,15 @@ namespace Engine {
 		std::string source = ReadFile(filepath);
 		auto shaderSrc = PreProcess(source);
 		Compile(shaderSrc);
+
+		auto lastSlash = filepath.find_last_of("/\\");
+		lastSlash = lastSlash == std::string::npos ? 0 : lastSlash + 1;
+		auto lastDot = filepath.rfind(".");
+		auto count = lastDot == std::string::npos ? filepath.size() - lastSlash : lastDot - lastSlash;
+		m_Name=filepath.substr(lastSlash, count);
 	}
-	OpenGLShader::OpenGLShader(const std::string& vertexSrc, const std::string& fragmentSrc)
-	{
+	OpenGLShader::OpenGLShader(const std::string& name, const std::string& vertexSrc, const std::string& fragmentSrc)
+			:m_Name(name){
 		std::unordered_map<GLenum, std::string> sources;
 		sources[GL_VERTEX_SHADER] = vertexSrc;
 		sources[GL_FRAGMENT_SHADER] = fragmentSrc;
@@ -71,7 +78,9 @@ namespace Engine {
 
 	void OpenGLShader::Compile(const std::unordered_map<GLenum, std::string>& shaderSrc) {
 		GLuint program = glCreateProgram();
-		std::vector<GLenum>  glShaderIDs(shaderSrc.size());
+		EG_CORE_ASSERT(shaderSrc.size() <= 2, "only 2 shaders are supported for now!!");
+		std::array<GLenum,2>  glShaderIDs;
+		int glShaderIDIndex = 0;
 		for (auto& kv : shaderSrc) {
 			GLenum type = kv.first;
 			const std::string& source = kv.second;
@@ -106,7 +115,7 @@ namespace Engine {
 			}
 			// Attach our shaders to our program
 			glAttachShader(program, shader);
-			glShaderIDs.push_back(shader);
+			glShaderIDs[glShaderIDIndex++]=shader;
 		}
 
 		// Vertex and fragment shaders are successfully compiled.
