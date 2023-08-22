@@ -1,6 +1,6 @@
 #pragma once
 #include "hzpch.h"
-#include "Engine/Core.h"
+#include "Engine/Core/Core.h"
 
 namespace Engine {
 
