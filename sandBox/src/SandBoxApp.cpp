@@ -1,4 +1,6 @@
 #include <Engine.h>
+#include "Engine/Core/EntryPoint.h"
+
 #include "Platform/OpenGL/OpenGLShader.h"
 
 #include "imgui.h"
@@ -8,13 +10,15 @@
 
 #include "Engine/Renderer/Shader.h"
 
+#include "SandBox2D.h"
+
 
 class ExampleLayer : public Engine::Layer {
 public:
 	ExampleLayer()
 		:Layer("Example"),m_CameraController(16.0/9.0f ){
 
-		m_VertexArray.reset(Engine::VertexArray::Create());
+		m_VertexArray = Engine::VertexArray::Create();
 
 		float vertices[3 * 7] = {
 			//Position						//Color
@@ -40,7 +44,7 @@ public:
 		m_IndexBuffer.reset(Engine::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
 		m_VertexArray->SetIndexBuffer(m_IndexBuffer);
 
-		m_SquareVA.reset(Engine::VertexArray::Create());
+		m_SquareVA = Engine::VertexArray::Create();
 		float squareVertices[4 * 5] = {
 				//Vertices					//UV
 			-0.5f,	-0.5f,	0.0f,		0.0f,	0.0f,
@@ -199,7 +203,8 @@ private:
 class Sandbox : public Engine::Application {
 public:
 	Sandbox() {
-		PushLayer(new ExampleLayer());
+		//PushLayer(new ExampleLayer());
+		PushLayer(new SandBox2D());
 	}
 	~Sandbox() {
 
