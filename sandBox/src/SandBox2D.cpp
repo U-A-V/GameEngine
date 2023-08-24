@@ -30,8 +30,8 @@ void SandBox2D::OnUpdate(Engine::TimeStamp ts)
 
 	Engine::Renderer2D::BeginScene(m_CameraController.GetCamera());
 
-	Engine::Renderer2D::DrawQuad({ 0.0f,0.0f }, {1.0,1.0},m_SquareColor);
-	Engine::Renderer2D::DrawQuad({ -0.05f,0.05f, -0.2f }, {1.0,1.0},m_Texture);
+	Engine::Renderer2D::DrawQuad({ 0.0f,0.0f }, {1.0f,1.0f},m_SquareColor);
+	Engine::Renderer2D::DrawQuad({ 0.0f,0.0f, -0.2f }, {10.0f,10.0f},m_Texture);
 
 	Engine::Renderer2D::EndScene();
 }
