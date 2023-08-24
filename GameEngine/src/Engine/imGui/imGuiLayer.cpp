@@ -74,10 +74,5 @@ namespace Engine {
 			glfwMakeContextCurrent(backup_current_context);
 		}
 	}
-
-	void imGuiLayer::OnImGuiRender() {
-		static bool show = true;
-		ImGui::ShowDemoWindow(&show);
-	}
 	
 }
