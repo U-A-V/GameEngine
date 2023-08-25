@@ -19,12 +19,14 @@ namespace Engine {
 	}
 
 	WindowsWindow::WindowsWindow(const WindowProps& props) {
+		EG_PROFILE_FUNCTION();
 		Init(props);
 	}
 
 	WindowsWindow::~WindowsWindow(){}
 
 	void WindowsWindow::Init(const WindowProps& props) {
+		EG_PROFILE_FUNCTION();
 		m_Data.Title = props.Title;
 		m_Data.Width = props.Width;
 		m_Data.Height = props.Height;
@@ -118,17 +120,22 @@ namespace Engine {
 	}
 
 	void WindowsWindow::Shutdown() {
+		EG_PROFILE_FUNCTION();
+
 		glfwDestroyWindow(m_Window);
 	}
 
 	void WindowsWindow::OnUpdate() {
+		EG_PROFILE_FUNCTION();
 		glfwPollEvents();
 		m_Context->SwapBuffers();
 	}
 	
 	void WindowsWindow::SetVSync(bool enabled) {
+		EG_PROFILE_FUNCTION();
+
 		if (enabled)	glfwSwapInterval(1);
-		else			glfwSwapInterval(1);
+		else			glfwSwapInterval(0);
 
 		m_Data.VSync = enabled;
 	}

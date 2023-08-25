@@ -19,12 +19,6 @@ private:
 	Engine::Ref<Engine::VertexArray> m_SquareVA;
 	Engine::Ref<Engine::Texture2D> m_Texture;
 
-	struct ProfileResult {
-		const char* Name;
-		float Time;
-	};
-
-	std::vector<ProfileResult> m_ProfileResults;
 
 	glm::vec4 m_SquareColor = { 0.2f,0.3f,0.8f,1.0f };
 

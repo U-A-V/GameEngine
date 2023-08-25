@@ -17,6 +17,7 @@ namespace Engine {
 		virtual void Unbind() const override;
 
 		virtual void SetInt(int value, const std::string& name) override;
+		virtual void SetFloat(float value, const std::string& name) override;
 		virtual void SetFloat3(const glm::vec3& value, const std::string& name) override;
 		virtual void SetFloat4(const glm::vec4& value, const std::string& name) override;
 		virtual void SetMat4(const glm::mat4& value, const std::string& name) override;
