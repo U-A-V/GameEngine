@@ -11,9 +11,6 @@ namespace Engine {
 
 	}
 
-
-
-
 	void OrthographicCameraController::OnUpdate(TimeStamp ts){
 		EG_PROFILE_FUNCTION();
 

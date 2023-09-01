@@ -12,6 +12,9 @@ namespace Engine {
 		Renderer2D::Init();
 
 	}
+	void Renderer::Shutdown() {
+		Renderer2D::Shutdown();
+	}
 	void Renderer::OnWindowResize(uint32_t width, uint32_t height) {
 		RenderCommand::SetViewport(0, 0, width, height);
 	}
@@ -26,8 +29,8 @@ namespace Engine {
 	void Renderer::Submit(const Ref<Shader>& shader,const Ref<VertexArray>& vertexArray,const glm::mat4& transform){
 
 		shader->Bind();
-		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4(m_SceneData->ViewProjectionMatrix, "u_ViewProjection");
-		std::dynamic_pointer_cast<OpenGLShader>(shader)->UploadUniformMat4(transform, "u_Transform");
+		shader->SetMat4(m_SceneData->ViewProjectionMatrix, "u_ViewProjection");
+		shader->SetMat4(transform, "u_Transform");
 
 		vertexArray->Bind();
 		RenderCommand::DrawIndexed(vertexArray);

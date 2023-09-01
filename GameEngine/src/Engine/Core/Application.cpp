@@ -1,7 +1,6 @@
 #include "hzpch.h"
 #include "Application.h"
 #include "Input.h"
-
 #include "Engine/Renderer/Renderer.h"
 
 #include <GLFW/glfw3.h>
@@ -28,7 +27,7 @@ namespace Engine {
 	}
 	Application::~Application() {
 		EG_PROFILE_FUNCTION();
-
+		Renderer::Shutdown();
 	}
 	void Application::PushLayer(Layer* layer) {
 		EG_PROFILE_FUNCTION();

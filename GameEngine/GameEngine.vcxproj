@@ -602,6 +602,7 @@
     <ClCompile Include="src\Engine\Core\LayerStack.cpp" />
     <ClCompile Include="src\Engine\Core\Log.cpp" />
     <ClCompile Include="src\Engine\Renderer\Buffer.cpp" />
+    <ClCompile Include="src\Engine\Renderer\GraphicContext.cpp" />
     <ClCompile Include="src\Engine\Renderer\OrthographicCameraController.cpp" />
     <ClCompile Include="src\Engine\Renderer\OtrhographicCamera.cpp" />
     <ClCompile Include="src\Engine\Renderer\RenderCommand.cpp" />

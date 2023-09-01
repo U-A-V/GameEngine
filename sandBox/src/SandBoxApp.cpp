@@ -27,7 +27,7 @@ public:
 		0.0f,	0.5f,	0.0f,		0.8f,	0.8f,	0.2f,	1.0f,
 		};
 		Engine::Ref<Engine::VertexBuffer> m_VertexBuffer;
-		m_VertexBuffer.reset(Engine::VertexBuffer::Create(vertices, sizeof(vertices)));
+		m_VertexBuffer = Engine::VertexBuffer::Create(vertices, sizeof(vertices));
 
 		Engine::BufferLayout layout = {
 			{Engine::ShaderDataType::Float3, "a_Position" },
@@ -41,7 +41,7 @@ public:
 			0,	1,	2
 		};
 		Engine::Ref<Engine::IndexBuffer> m_IndexBuffer;
-		m_IndexBuffer.reset(Engine::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t)));
+		m_IndexBuffer = Engine::IndexBuffer::Create(indices, sizeof(indices) / sizeof(uint32_t));
 		m_VertexArray->SetIndexBuffer(m_IndexBuffer);
 
 		m_SquareVA = Engine::VertexArray::Create();
@@ -53,7 +53,7 @@ public:
 			-0.5f,	0.5f,	0.0f,		0.0f,	1.0f
 		};
 		Engine::Ref<Engine::VertexBuffer> squareVB;
-		squareVB.reset(Engine::VertexBuffer::Create(squareVertices, sizeof(squareVertices)));
+		squareVB = Engine::VertexBuffer::Create(squareVertices, sizeof(squareVertices));
 
 		Engine::BufferLayout squareLayout = {
 			{Engine::ShaderDataType::Float3, "a_Position"},
@@ -70,7 +70,7 @@ public:
 		};
 
 		Engine::Ref<Engine::IndexBuffer> squareIB;
-		squareIB.reset(Engine::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t)));
+		squareIB = Engine::IndexBuffer::Create(squareIndices, sizeof(squareIndices) / sizeof(uint32_t));
 		m_SquareVA->SetIndexBuffer(squareIB);
 
 

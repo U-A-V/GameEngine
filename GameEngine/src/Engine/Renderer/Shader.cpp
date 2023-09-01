@@ -10,7 +10,7 @@ namespace Engine {
 		switch (Renderer::GetAPI()) {
 
 		case RendererAPI::API::None:	EG_CORE_ASSERT(false, "RendererAPI::None is not supported!!");
-		case RendererAPI::API::OpenGL:	return std::make_shared<OpenGLShader>(filepath);
+		case RendererAPI::API::OpenGL:	return CreateRef<OpenGLShader>(filepath);
 		}
 
 		EG_CORE_ASSERT(false, "Unknown RendererAPI");
@@ -21,7 +21,7 @@ namespace Engine {
 		switch (Renderer::GetAPI()) {
 
 			case RendererAPI::API::None:	EG_CORE_ASSERT(false, "RendererAPI::None is not supported!!");
-			case RendererAPI::API::OpenGL:	return std::make_shared<OpenGLShader>(name, vertexSrc, fragmentSrc);
+			case RendererAPI::API::OpenGL:	return CreateRef<OpenGLShader>(name, vertexSrc, fragmentSrc);
 		}
 
 		EG_CORE_ASSERT(false, "Unknown RendererAPI");
