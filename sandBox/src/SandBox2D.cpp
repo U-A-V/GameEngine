@@ -16,6 +16,7 @@ void SandBox2D::OnAttach()
 	EG_PROFILE_SCOPE("CameraController::Onupdate");
 
 	m_Texture = Engine::Texture2D::Create("assets/textures/Checkerboard.png");
+	m_SpriteSheet = Engine::Texture2D::Create("assets/textures/RPGpack_sheet_2X.png");
 
 	m_Particle.ColorBegin = { 254 / 255.0f, 212 / 255.0f, 123 / 255.0f, 1.0f };
 	m_Particle.ColorEnd = { 254 / 255.0f, 109 / 255.0f, 41 / 255.0f, 1.0f };
@@ -47,7 +48,7 @@ void SandBox2D::OnUpdate(Engine::TimeStamp ts)
 		Engine::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 		Engine::RenderCommand::Clear();
 	}
-
+#if 0
 	{
 		static float rotation = 0.0f;
 		rotation += ts * 2.0f;
@@ -72,7 +73,7 @@ void SandBox2D::OnUpdate(Engine::TimeStamp ts)
 		}
 		Engine::Renderer2D::EndScene();
 	}
-
+#endif
 	if (Engine::Input::IsMouseButtonPressed(EG_MOUSE_BUTTON_LEFT))
 	{
 		auto [x, y] = Engine::Input::GetMousePosition();
@@ -90,6 +91,11 @@ void SandBox2D::OnUpdate(Engine::TimeStamp ts)
 
 	m_ParticleSystem.OnUpdate(ts);
 	m_ParticleSystem.OnRender(m_CameraController.GetCamera());
+	
+	Engine::Renderer2D::BeginScene(m_CameraController.GetCamera());
+	Engine::Renderer2D::DrawQuad({ 0.0f,0.0f,0.5f }, { 1.0f,1.0f }, m_SpriteSheet);
+	Engine::Renderer2D::EndScene();
+	
 }
 
 void SandBox2D::OnImGuiRender()
