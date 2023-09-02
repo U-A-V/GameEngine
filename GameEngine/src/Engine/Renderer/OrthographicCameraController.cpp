@@ -6,7 +6,7 @@
 
 namespace Engine {
 	OrthographicCameraController::OrthographicCameraController(float aspectRatio, bool rotation)
-		:m_AspectRatio(aspectRatio),m_Camera(-m_AspectRatio*m_Zoomlevel, m_AspectRatio*m_Zoomlevel, -m_Zoomlevel, m_Zoomlevel), m_Rotation(rotation){
+		:m_AspectRatio(aspectRatio), m_Bounds({ -m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel }),m_Camera(m_Bounds.Left, m_Bounds.Right, m_Bounds.Bottom, m_Bounds.Top), m_Rotation(rotation){
 
 
 	}
@@ -46,12 +46,13 @@ namespace Engine {
 
 	}
 
-	bool OrthographicCameraController::OnMouseScrolled(MouseScrolledEvent& e){
+	bool OrthographicCameraController::OnMouseScrolled(MouseScrolledEvent& e) {
 		EG_PROFILE_FUNCTION();
 
-		m_Zoomlevel -= e.GetYOffset()*0.25;
-		m_Zoomlevel = std::max(m_Zoomlevel, 0.25f);
-		m_Camera.SetProjection(-m_AspectRatio * m_Zoomlevel, m_AspectRatio * m_Zoomlevel, -m_Zoomlevel, m_Zoomlevel);
+		m_ZoomLevel -= e.GetYOffset() * 0.25;
+		m_ZoomLevel = std::max(m_ZoomLevel, 0.25f);
+		m_Bounds = {-m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel};
+		m_Camera.SetProjection(m_Bounds.Left, m_Bounds.Right, m_Bounds.Bottom, m_Bounds.Top);
 		return false;
 	}
 
@@ -59,7 +60,8 @@ namespace Engine {
 		EG_PROFILE_FUNCTION();
 
 		m_AspectRatio = e.GetWidth() / (float)e.GetHeight();
-		m_Camera.SetProjection(-m_AspectRatio * m_Zoomlevel, m_AspectRatio * m_Zoomlevel, -m_Zoomlevel, m_Zoomlevel);
+		m_Bounds = { -m_AspectRatio * m_ZoomLevel, m_AspectRatio * m_ZoomLevel, -m_ZoomLevel, m_ZoomLevel };
+		m_Camera.SetProjection(m_Bounds.Left, m_Bounds.Right, m_Bounds.Bottom, m_Bounds.Top);
 		return false;
 	}
 }

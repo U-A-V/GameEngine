@@ -1,1 +1,0 @@
-{"otherData": {},"traceEvents":[{"cat":"function","dur":0,"name":"void __cdecl Engine::Renderer2D::Shutdown(void)","ph":"X","pid":0,"tid":405996074,"ts":10859095566},{"cat":"function","dur":66,"name":"__cdecl Engine::Application::~Application(void)","ph":"X","pid":0,"tid":405996074,"ts":10859095566}]}
