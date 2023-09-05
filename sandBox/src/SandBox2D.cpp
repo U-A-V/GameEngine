@@ -4,7 +4,24 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Platform/OpenGL/OpenGLShader.h"
+static const uint32_t s_MapWidth = 24;
+static const char* s_MapTiles = 
+"WWWWWWWWWWWWWWWWWWWWWWWW"
+"WWWDDDDWWWWWWWWWWDDDDWWW"
+"WWWWDDDDWWWWWWWWDDDDWWWW"
+"WWWWWDDDDWWWWWWDDDDWWWWW"
+"WWWWWWDDDDWWWWDDDDWWWWWW"
+"WWWWWWWDDDDWWDDDDWWWWWWW"
+"WWWWWWWWDDDDDDDDWWWWWWWW"
+"WWWWWWWWWDDDDDDWWWWWWWWW"
+"WWWWWWWWWWDDDDWWWWWWWWWW"
+"WWWWWWWWWWDDDDWWWWWWWWWW"
+"WWWWWWWWWWDDDDWWWWWWWWWW"
+"WWWWWWWWWWDDDDWWWWWWWWWW"
+"WWWWWWWWWWDDDDWWWWWWWWWW"
+"WWWWWWWWWWWWWWWWWWWWWWWW"
+;
+
 
 
 SandBox2D::SandBox2D()
@@ -12,15 +29,18 @@ SandBox2D::SandBox2D()
 }
 
 void SandBox2D::OnAttach()
-{
-	EG_PROFILE_SCOPE("CameraController::Onupdate");
+{	
+	EG_PROFILE_FUNCTION();
 
 	m_Texture = Engine::Texture2D::Create("assets/textures/Checkerboard.png");
 	m_SpriteSheet = Engine::Texture2D::Create("assets/textures/RPGpack_sheet_2X.png");
 
-	m_TextureStairs = Engine::SubTexture2D::CreateFromCoords(m_SpriteSheet, { 7,6 }, { 128,128 });
-	m_TextureBarrel = Engine::SubTexture2D::CreateFromCoords(m_SpriteSheet, { 8,2 }, { 128,128 });
-	m_TextureTree = Engine::SubTexture2D::CreateFromCoords(m_SpriteSheet, { 2,1 }, { 128,128 }, { 1,2 });
+	m_TextureStairs = Engine::SubTexture2D::CreateFromCoords(m_SpriteSheet, { 2,3 }, { 128,128 });
+
+	m_MapWidth = s_MapWidth;
+	m_MapHeight = strlen(s_MapTiles) / m_MapWidth;
+	s_TextureMap['D'] = Engine::SubTexture2D::CreateFromCoords(m_SpriteSheet, { 6,11 }, { 128,128 });
+	s_TextureMap['W'] = Engine::SubTexture2D::CreateFromCoords(m_SpriteSheet, { 11,11 }, { 128,128 });
 
 	m_Particle.ColorBegin = { 254 / 255.0f, 212 / 255.0f, 123 / 255.0f, 1.0f };
 	m_Particle.ColorEnd = { 254 / 255.0f, 109 / 255.0f, 41 / 255.0f, 1.0f };
@@ -29,7 +49,8 @@ void SandBox2D::OnAttach()
 	m_Particle.Velocity = { 0.0f, 0.0f };
 	m_Particle.VelocityVariation = { 3.0f, 1.0f };
 	m_Particle.Position = { 0.0f, 0.0f };
-	 
+	
+	m_CameraController.SetZoomLevel(5.0f);
 }
 
 void SandBox2D::OnDetach()
@@ -52,7 +73,7 @@ void SandBox2D::OnUpdate(Engine::TimeStamp ts)
 		Engine::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 		Engine::RenderCommand::Clear();
 	}
-#if 0
+#if 1
 	{
 		static float rotation = 0.0f;
 		rotation += ts * 2.0f;
@@ -95,18 +116,90 @@ void SandBox2D::OnUpdate(Engine::TimeStamp ts)
 
 	m_ParticleSystem.OnUpdate(ts);
 	m_ParticleSystem.OnRender(m_CameraController.GetCamera());
-	
+#if 0
 	Engine::Renderer2D::BeginScene(m_CameraController.GetCamera());
-	Engine::Renderer2D::DrawQuad({ 0.0f,0.0f,0.5f }, { 1.0f,1.0f }, m_TextureStairs);
-	Engine::Renderer2D::DrawQuad({ 1.0f,0.0f,0.5f }, { 1.0f,1.0f }, m_TextureBarrel);
-	Engine::Renderer2D::DrawQuad({ 0.5f,1.5f,0.5f }, { 1.0f,2.0f }, m_TextureTree);
+	for (uint32_t y = 0; y < m_MapHeight; y++) {
+		for (uint32_t x = 0; x < m_MapWidth; x++) {
+			char tile = s_MapTiles[x + y * m_MapWidth];
+			Engine::Ref<Engine::SubTexture2D> texture;
+			if (s_TextureMap.find(tile) != s_TextureMap.end())
+				texture = s_TextureMap[tile];
+			else
+				texture = m_TextureStairs;
+
+			Engine::Renderer2D::DrawQuad({ x - m_MapWidth / 2.0f ,m_MapHeight - y - m_MapHeight / 2.0f, 0.5f }, { 1.0f,1.0f }, texture);
+		}
+	}
+	//Engine::Renderer2D::DrawQuad({ 0.0f,0.0f,0.5f }, { 1.0f,1.0f }, m_TextureStairs);
+	//Engine::Renderer2D::DrawQuad({ 1.0f,0.0f,0.5f }, { 1.0f,1.0f }, m_TextureBarrel);
+	//Engine::Renderer2D::DrawQuad({ 0.5f,1.5f,0.5f }, { 1.0f,2.0f }, m_TextureTree);
 	Engine::Renderer2D::EndScene();
-	
+#endif 
 }
 
 void SandBox2D::OnImGuiRender()
 {
 	EG_PROFILE_FUNCTION();
+	static bool dockSpacOpen = true;
+	static bool opt_fullscreen = true;
+	static bool opt_padding = false;
+	static ImGuiDockNodeFlags dockspace_flags = ImGuiDockNodeFlags_None;
+
+		// We are using the ImGuiWindowFlags_NoDocking flag to make the parent window not dockable into,
+		// because it would be confusing to have two docking targets within each others.
+	ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+	if (opt_fullscreen){
+		const ImGuiViewport* viewport = ImGui::GetMainViewport();
+		ImGui::SetNextWindowPos(viewport->WorkPos);
+		ImGui::SetNextWindowSize(viewport->WorkSize);
+		ImGui::SetNextWindowViewport(viewport->ID);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+		window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+		window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+	}
+	else{
+		dockspace_flags &= ~ImGuiDockNodeFlags_PassthruCentralNode;
+	}
+
+		// When using ImGuiDockNodeFlags_PassthruCentralNode, DockSpace() will render our background
+		// and handle the pass-thru hole, so we ask Begin() to not render a background.
+	if (dockspace_flags & ImGuiDockNodeFlags_PassthruCentralNode)
+		window_flags |= ImGuiWindowFlags_NoBackground;
+
+		// Important: note that we proceed even if Begin() returns false (aka window is collapsed).
+		// This is because we want to keep our DockSpace() active. If a DockSpace() is inactive,
+		// all active windows docked into it will lose their parent and become undocked.
+		// We cannot preserve the docking relationship between an active window and an inactive docking, otherwise
+		// any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
+	if (!opt_padding)
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+	ImGui::Begin("DockSpace Demo", &dockSpacOpen, window_flags);
+	if (!opt_padding)
+		ImGui::PopStyleVar();
+
+	if (opt_fullscreen)
+		ImGui::PopStyleVar(2);
+
+		// Submit the DockSpace
+	ImGuiIO& io = ImGui::GetIO();
+	if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
+	{
+		ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+		ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
+	}
+
+	if (ImGui::BeginMenuBar())
+	{
+		if (ImGui::BeginMenu("Options"))
+		{
+			// Disabling fullscreen would allow the window to be moved to the front of other windows,
+			// which we can't undo at the moment without finer window depth/z control.
+			if (ImGui::MenuItem("Exit")) Engine::Application::Get().Close();
+			ImGui::EndMenu();
+		}
+		ImGui::EndMenuBar();
+	}
 	ImGui::Begin("Settings");
 	auto stats = Engine::Renderer2D::GetStats();
 	ImGui::Text("Renderer2D Stats:");
@@ -115,7 +208,14 @@ void SandBox2D::OnImGuiRender()
 	ImGui::Text("Vertex Count: %d", stats.GetTotalVertexCount());
 	ImGui::Text("Index Count: %d", stats.GetTotalIndexCount());
 	ImGui::ColorEdit4("Square Color", glm::value_ptr(m_SquareColor));
+
+	uint32_t textureID = m_Texture->GetRendererID();
+
+	ImGui::Image((void*)textureID, ImVec2({ 64.0f,64.0f }));
 	ImGui::End();
+
+	ImGui::End();
+	
 }
 
 void SandBox2D::OnEvent(Engine::Event& e)
