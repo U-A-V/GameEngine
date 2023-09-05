@@ -135,11 +135,26 @@ void EditorLayer::OnImGuiRender()
 	ImGui::Text("Vertex Count: %d", stats.GetTotalVertexCount());
 	ImGui::Text("Index Count: %d", stats.GetTotalIndexCount());
 	ImGui::ColorEdit4("Square Color", glm::value_ptr(m_SquareColor));
+	ImGui::End();
+
+
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0,0 });
+	ImGui::Begin("ViewPort");
+
+	ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+
+	if (m_ViewportSize != *(glm::vec2*)&viewportPanelSize) {
+
+		m_FrameBuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+		m_ViewportSize = { viewportPanelSize.x,viewportPanelSize.y };
+		m_CameraController.OnResize(m_ViewportSize.x, m_ViewportSize.y);
+	}
 
 	uint32_t textureID = m_FrameBuffer->GetColorAttachmentRendererID();
-
-	ImGui::Image((void*)textureID, ImVec2{ 1280.0f,720.0f }, ImVec2{ 0,1 }, ImVec2{ 1,0 });
+	ImGui::Image((void*)textureID, ImVec2{ m_ViewportSize.x,m_ViewportSize.y }, ImVec2{ 0,1 }, ImVec2{ 1,0 });
 	ImGui::End();
+	ImGui::PopStyleVar();
+
 
 	ImGui::End();
 	
