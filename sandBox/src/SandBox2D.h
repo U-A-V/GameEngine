@@ -19,11 +19,10 @@ private:
 
 	Engine::Ref<Engine::Shader> m_FlatColorShader;
 	Engine::Ref<Engine::VertexArray> m_SquareVA;
-	Engine::Ref<Engine::Texture2D> m_Texture;
-	Engine::Ref<Engine::Texture2D> m_SpriteSheet;
-	Engine::Ref<Engine::SubTexture2D> m_TextureStairs;
-	Engine::Ref<Engine::SubTexture2D> m_TextureBarrel;
-	Engine::Ref<Engine::SubTexture2D> m_TextureTree;
+	Engine::Ref<Engine::FrameBuffer> m_FrameBuffer;
+
+	Engine::Ref<Engine::Texture2D> m_Texture, m_SpriteSheet;
+	Engine::Ref<Engine::SubTexture2D> m_TextureStairs, m_TextureBarrel, m_TextureTree;
 
 	glm::vec4 m_SquareColor = { 0.2f,0.3f,0.8f,1.0f };
 

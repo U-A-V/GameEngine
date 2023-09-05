@@ -33,6 +33,12 @@ void SandBox2D::OnAttach()
 	EG_PROFILE_FUNCTION();
 
 	m_Texture = Engine::Texture2D::Create("assets/textures/Checkerboard.png");
+
+	Engine::FrameBufferSpecification fbSpec;
+	fbSpec.Width = 1280;
+	fbSpec.Height = 720;
+
+	m_FrameBuffer = Engine::FrameBuffer::Create(fbSpec);
 	m_SpriteSheet = Engine::Texture2D::Create("assets/textures/RPGpack_sheet_2X.png");
 
 	m_TextureStairs = Engine::SubTexture2D::CreateFromCoords(m_SpriteSheet, { 2,3 }, { 128,128 });
@@ -70,6 +76,7 @@ void SandBox2D::OnUpdate(Engine::TimeStamp ts)
 	Engine::Renderer2D::ResetStats();
 	{
 		EG_PROFILE_SCOPE("Renderer Prep");
+		m_FrameBuffer->Bind();
 		Engine::RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 		Engine::RenderCommand::Clear();
 	}
@@ -97,6 +104,7 @@ void SandBox2D::OnUpdate(Engine::TimeStamp ts)
 			}
 		}
 		Engine::Renderer2D::EndScene();
+		m_FrameBuffer->Unbind();
 	}
 #endif
 	if (Engine::Input::IsMouseButtonPressed(EG_MOUSE_BUTTON_LEFT))
@@ -209,9 +217,9 @@ void SandBox2D::OnImGuiRender()
 	ImGui::Text("Index Count: %d", stats.GetTotalIndexCount());
 	ImGui::ColorEdit4("Square Color", glm::value_ptr(m_SquareColor));
 
-	uint32_t textureID = m_Texture->GetRendererID();
+	uint32_t textureID = m_FrameBuffer->GetColorAttachmentRendererID();
 
-	ImGui::Image((void*)textureID, ImVec2({ 64.0f,64.0f }));
+	ImGui::Image((void*)textureID, ImVec2({ 1280.0f,720.0f }));
 	ImGui::End();
 
 	ImGui::End();
