@@ -84,6 +84,55 @@ project "GameEngine"
         
 
 
+project "Engine-Editor"
+    location "Engine-Editor"
+    kind "ConsoleApp"
+    language "C++"
+    cppdialect "C++17"
+    staticruntime "on"
+
+    targetdir ("bin/" .. outputdir .. "/%{prj.name}")
+    objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
+
+    files{
+        "%{prj.name}/src/**.h",
+        "%{prj.name}/src/**.cpp",
+
+    }
+
+    includedirs {
+        "GameEngine/vendor/spdlog/include",
+        "GameEngine/src",
+        "%{IncludeDir.glm}",
+        "%{IncludeDir.imgui}"
+
+    }
+
+    links {
+        "GameEngine"
+    }
+    filter "system:windows"
+        systemversion "latest"
+
+        defines{
+
+            "EG_PLATFORM_WINDOWS",
+        }
+    filter "configurations:Debug"
+        defines "EG_DEBUG"
+        symbols "on"
+        runtime "Debug"
+
+    filter "configurations:Release"
+        defines "EG_RELEASE"
+        optimize "on"
+        runtime "Release"
+
+    filter "configurations:Dist"
+        defines "EG_DIST"
+        optimize "on"
+        runtime "Release"
+
 project "sandBox"
     location "sandBox"
     kind "ConsoleApp"
@@ -132,3 +181,4 @@ project "sandBox"
         defines "EG_DIST"
         optimize "on"
         runtime "Release"
+
