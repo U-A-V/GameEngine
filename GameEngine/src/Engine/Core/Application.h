@@ -1,18 +1,11 @@
 #pragma once
-#include "Core.h"
-
-#include "Window.h"
+#include "Engine/Core/Core.h"
 #include "Engine/Core/LayerStack.h"
+#include "Engine/Core/Window.h"
 #include "Engine/Events/Event.h"
 #include "Engine/Events/ApplicatonEvent.h"
 
 #include "Engine/imGui/imGuiLayer.h"
-
-#include "Engine/Renderer/Shader.h"
-#include "Engine/Renderer/Buffer.h"
-#include "Engine/Renderer/VertexArray.h"
-
-#include "Engine/Renderer/OrthographicCamera.h"
 
 #include "Engine/Core/TimeStamp.h"
 
@@ -23,16 +16,20 @@ namespace Engine {
 		Application(const std::string& name = "App");
 		virtual ~Application();
 
-		void Run();
 
 		void OnEvent(Event& e);
 
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* overlay);
 
+		Window& GetWindow() { return *m_Window; }
+
 		void Close();
-		inline static Application& Get() { return *s_Instance; }
-		inline Window& GetWindow() { return *m_Window; }
+
+		imGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
+		static Application& Get() { return *s_Instance; }
+
+		void Run();
 	private:
 		bool OnWindowClose(WindowCloseEvent& e);
 		bool OnWindowResize(WindowResizeEvent& e);

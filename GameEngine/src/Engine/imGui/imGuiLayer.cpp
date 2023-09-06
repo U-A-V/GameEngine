@@ -58,6 +58,13 @@ namespace Engine {
 		ImGui_ImplGlfw_Shutdown();
 		ImGui::DestroyContext();
 	}
+	void imGuiLayer::OnEvent(Event& e) {
+		if (m_BlockEvents) {
+			ImGuiIO& io = ImGui::GetIO();
+			e.Handled |= e.IsInCategory(EventCategoryMouse) & io.WantCaptureMouse;
+			e.Handled |= e.IsInCategory(EventCategoryKeyBoard) & io.WantCaptureKeyboard;
+		}
+	}
 	void imGuiLayer::Begin() {
 		EG_PROFILE_FUNCTION();
 
