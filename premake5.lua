@@ -1,6 +1,6 @@
 workspace "GameEngine"
     architecture "x64"
-    startproject "sandBox"
+    startproject "Engine-Editor"
     configurations {
         "Debug",
         "Release",
@@ -15,6 +15,7 @@ IncludeDir["Glad"] = "GameEngine/vendor/Glad/include"
 IncludeDir["imgui"] = "GameEngine/vendor/imgui"
 IncludeDir["glm"]="GameEngine/vendor/glm"
 IncludeDir["stb"]="GameEngine/vendor/stb_image"
+IncludeDir["entt"]="GameEngine/vendor/entt/include"
 
 include "GameEngine/vendor/GLFW"
 include "GameEngine/vendor/Glad"
@@ -51,6 +52,7 @@ project "GameEngine"
         "%{IncludeDir.imgui}",
         "%{IncludeDir.glm}",
         "%{IncludeDir.stb}",
+        "%{IncludeDir.entt}",
     }
 
     links{
@@ -104,7 +106,8 @@ project "Engine-Editor"
         "GameEngine/vendor/spdlog/include",
         "GameEngine/src",
         "%{IncludeDir.glm}",
-        "%{IncludeDir.imgui}"
+        "%{IncludeDir.imgui}",
+        "%{IncludeDir.entt}",
 
     }
 
@@ -153,7 +156,8 @@ project "sandBox"
         "GameEngine/vendor/spdlog/include",
         "GameEngine/src",
         "%{IncludeDir.glm}",
-        "%{IncludeDir.imgui}"
+        "%{IncludeDir.imgui}",
+        "%{IncludeDir.entt}",
 
     }
 

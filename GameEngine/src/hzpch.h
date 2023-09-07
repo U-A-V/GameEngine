@@ -17,6 +17,6 @@
 
 #include "Engine/Debug/Instrumentor.h"
 
-#ifdef HZ_PLATFORM_WINDOWS
-#include <Windows.h>
+#ifdef EG_PLATFORM_WINDOWS
+	#include <Windows.h>
 #endif
