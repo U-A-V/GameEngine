@@ -26,7 +26,7 @@ namespace Engine {
 		Ref<Texture2D> m_Texture;
 
 		Ref<Scene> m_ActiveScene;
-		entt::entity m_SquareEntity;
+		Entity m_SquareEntity;
 
 		bool m_ViewportFocused = false;
 		bool m_ViewportHovered = false;

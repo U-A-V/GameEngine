@@ -172,6 +172,7 @@
     <ClInclude Include="src\Engine\Renderer\VertexArray.h" />
     <ClInclude Include="src\Engine\imGui\imGuiLayer.h" />
     <ClInclude Include="src\Engine\Scene\Components.h" />
+    <ClInclude Include="src\Engine\Scene\Entity.h" />
     <ClInclude Include="src\Engine\Scene\Scene.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h" />
@@ -620,6 +621,7 @@
     <ClCompile Include="src\Engine\Renderer\VertexArray.cpp" />
     <ClCompile Include="src\Engine\imGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\Engine\imGui\imGuiLayer.cpp" />
+    <ClCompile Include="src\Engine\Scene\Entity.cpp" />
     <ClCompile Include="src\Engine\Scene\Scene.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLContext.cpp" />
