@@ -28,7 +28,9 @@ namespace Engine {
 		Ref<Scene> m_ActiveScene;
 		Entity m_SquareEntity;
 		Entity m_CameraEntity;
+		Entity m_SecondaryCamera;
 
+		bool m_PrimaryCamera = false;
 		bool m_ViewportFocused = false;
 		bool m_ViewportHovered = false;
 		glm::vec4 m_SquareColor = { 0.2f,0.3f,0.8f,1.0f };
