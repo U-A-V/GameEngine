@@ -35,6 +35,29 @@ namespace Engine {
 		m_SecondaryCamera = m_ActiveScene->CreateEntity("clip-space Entity");
 		auto& cc = m_SecondaryCamera.AddComponent<CameraComponent>();
 		cc.Primary = false;
+
+		class CameraController : public ScriptableEntity {
+		public:
+			void OnCreate() {
+				//std::cout << "Camera:oncreate!!" << std::endl;
+			}
+			void OnDestroy(){}
+			void OnUpdate(TimeStamp ts) {
+				auto& transform = GetComponent<TransformComponent>().Transform;
+				float speed = 5.0f;
+				if (Input::IsKeyPressed(EG_KEY_A))
+					transform[3][0] -= speed * ts;
+				if (Input::IsKeyPressed(EG_KEY_D))
+					transform[3][0] += speed * ts;
+				if (Input::IsKeyPressed(EG_KEY_W))
+					transform[3][1] += speed * ts;
+				if (Input::IsKeyPressed(EG_KEY_S))
+					transform[3][1] -= speed * ts;
+				//std::cout << "Timestep: " << ts << std::endl;
+
+			}
+		};
+		m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 	}
 
 	void EditorLayer::OnDetach()
