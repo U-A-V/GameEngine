@@ -1,6 +1,6 @@
 #pragma once
 #include "Engine.h"
-#include <entt.hpp>
+#include "Panel/SceneHierarchyPanel.h"
 
 namespace Engine {
 
@@ -37,6 +37,7 @@ namespace Engine {
 
 		glm::vec2 m_ViewportSize = { 0.0f,0.0f };
 
-
+		//panel
+		SceneHierarchyPanel m_SceneHierarchyPanel;
 	};
 }
