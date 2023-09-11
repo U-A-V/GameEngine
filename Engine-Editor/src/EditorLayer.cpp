@@ -174,11 +174,6 @@ namespace Engine {
 		ImGui::Text("Vertex Count: %d", stats.GetTotalVertexCount());
 		ImGui::Text("Index Count: %d", stats.GetTotalIndexCount());
 
-		if (ImGui::Checkbox("Camera A", &m_PrimaryCamera)) {
-			m_CameraEntity.GetComponent<CameraComponent>().Primary = m_PrimaryCamera;
-			m_SecondaryCamera.GetComponent<CameraComponent>().Primary = !m_PrimaryCamera;
-		}
-
 		ImGui::End();
 
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0,0 });
