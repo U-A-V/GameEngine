@@ -1,5 +1,7 @@
 #include "EditorLayer.h"
-#include "imgui.h"
+#include "Engine/Scene/SceneSerializer.h"
+
+#include <imgui.h>
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -66,6 +68,9 @@ namespace Engine {
 		m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
 
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+
+		SceneSerializer serializer(m_ActiveScene);
+		serializer.Serialize("assets/scenes/example.engine");
 	}
 
 	void EditorLayer::OnDetach()
