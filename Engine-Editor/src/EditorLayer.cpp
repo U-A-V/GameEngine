@@ -1,5 +1,6 @@
 #include "EditorLayer.h"
 #include "Engine/Scene/SceneSerializer.h"
+#include "Engine/Ulit/PlatformUtil.h"
 
 #include <imgui.h>
 
@@ -166,9 +167,15 @@ namespace Engine {
 
 		if (ImGui::BeginMenuBar())
 		{
-			if (ImGui::BeginMenu("Options"))
+			if (ImGui::BeginMenu("File"))
 			{
-				if (ImGui::MenuItem("Exit")) Application::Get().Close();
+				if (ImGui::MenuItem("New","Ctrl+N"))
+					NewScene();
+				if (ImGui::MenuItem("Open...", "Ctrl+O"))
+					OpenScene();
+				if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
+					SaveSceneAs();
+				if (ImGui::MenuItem("Exit", "Atl+F4")) Application::Get().Close();
 				ImGui::EndMenu();
 			}
 			ImGui::EndMenuBar();
@@ -213,5 +220,67 @@ namespace Engine {
 	void EditorLayer::OnEvent(Event& e)
 	{
 		m_CameraController.OnEvent(e);
+
+		EventDispatcher dispatcher(e);
+		dispatcher.Dispatch<KeyPressedEvent>(EG_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
 	}
+	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e) {
+
+		if (e.GetRepeatCount() > 0)
+			return false;
+
+		bool control = Input::IsKeyPressed(EG_KEY_LEFT_CONTROL) || Input::IsKeyPressed(EG_KEY_RIGHT_CONTROL);
+		bool shift = Input::IsKeyPressed(EG_KEY_LEFT_CONTROL) || Input::IsKeyPressed(EG_KEY_RIGHT_CONTROL);
+		switch (e.GetKeyCode()) {
+		case EG_KEY_N:
+		{
+			if (control)
+				NewScene();
+			break;
+		}
+		case EG_KEY_O:
+		{
+			if (control)
+				OpenScene();
+			break;
+		}
+		case EG_KEY_S:
+		{
+			if (control && shift)
+				SaveSceneAs();
+			break;
+		}
+		}
+	}
+
+
+	void EditorLayer::NewScene()
+	{
+		m_ActiveScene = CreateRef<Scene>();
+		m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+	}
+
+	void EditorLayer::OpenScene()
+	{
+		std::string filepath = FileDialogs::OpenFile("Scene (*.engine)\0*.engine\0");
+		if (!filepath.empty()) {
+			m_ActiveScene = CreateRef<Scene>();
+			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+			m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+			SceneSerializer serializer(m_ActiveScene);
+			serializer.Deserialize(filepath);
+		}
+	}
+
+	void EditorLayer::SaveSceneAs()
+	{
+		std::string filepath = FileDialogs::SaveFile("Scene (*.engine)\0*.engine\0");
+		if (!filepath.empty()) {
+
+			SceneSerializer serializer(m_ActiveScene);
+			serializer.Serialize(filepath);
+		}
+	}
+
 }

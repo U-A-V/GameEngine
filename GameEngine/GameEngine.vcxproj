@@ -178,6 +178,7 @@
     <ClInclude Include="src\Engine\Scene\SceneSerializer.h" />
     <ClInclude Include="src\Engine\Scene\ScriptableEntity.h" />
     <ClInclude Include="src\Engine\imGui\imGuiLayer.h" />
+    <ClInclude Include="src\Engine\Ulit\PlatformUtil.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLBuffer.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLContext.h" />
     <ClInclude Include="src\Platform\OpenGL\OpenGLFrameBuffer.h" />
@@ -629,6 +630,7 @@
     <ClCompile Include="src\Engine\Scene\SceneSerializer.cpp" />
     <ClCompile Include="src\Engine\imGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\Engine\imGui\imGuiLayer.cpp" />
+    <ClCompile Include="src\Engine\Ulit\WindowsPlatformUtils.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLBuffer.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLContext.cpp" />
     <ClCompile Include="src\Platform\OpenGL\OpenGLFrameBuffer.cpp" />

@@ -48,7 +48,7 @@ namespace YAML {
 			return node;
 		}
 		static bool decode(const Node& node, glm::vec4& rhs) {
-			if (!node.IsSequence() || node.size() != 3)
+			if (!node.IsSequence() || node.size() != 4)
 				return false;
 
 			rhs.x = node[0].as<float>();
@@ -193,8 +193,8 @@ namespace Engine {
 					tc.Translation = transformComponent["Translation"].as<glm::vec3>();
 					tc.Rotation = transformComponent["Rotation"].as<glm::vec3>();
 					tc.Scale = transformComponent["Scale"].as<glm::vec3>();
+					EG_CORE_TRACE("Deserialized Transform component");
 				}
-
 				auto cameraComponent = entity["CameraComponent"];
 				if (cameraComponent) {
 					auto& cc = deserializedEntity.AddComponent<CameraComponent>();
@@ -206,18 +206,20 @@ namespace Engine {
 					cc.Camera.SetPerspectiveNearClip(cameraProps["PerspectiveNear"].as<float>());
 					cc.Camera.SetPerspectiveFarClip(cameraProps["PerspectiveFar"].as<float>());
 					
-					cc.Camera.SetOrthographicSize(cameraProps["OtrthographicSize"].as<float>());
-					cc.Camera.SetOrthographicNearClip(cameraProps["OtrthographicNear"].as<float>());
-					cc.Camera.SetOrthographicFarClip(cameraProps["OtrthographicFar"].as<float>());
+					cc.Camera.SetOrthographicSize(cameraProps["OrthographicSize"].as<float>());
+					cc.Camera.SetOrthographicNearClip(cameraProps["OrthographicNear"].as<float>());
+					cc.Camera.SetOrthographicFarClip(cameraProps["OrthographicFar"].as<float>());
 
 					cc.Primary = cameraComponent["Primary"].as<bool>();
 					cc.FixedAspectRatio = cameraComponent["FixedAspectRatio"].as<bool>();
+					EG_CORE_TRACE("Deserialized Camera component");
 				}
 
 				auto spriteRendererComponent = entity["SpriteRendererComponent"];
 				if (spriteRendererComponent) {
 					auto& src = deserializedEntity.AddComponent<SpriteRendererComponent>();
 					src.Color = spriteRendererComponent["Color"].as<glm::vec4>();
+					EG_CORE_TRACE("Deserialized Sprite component");
 				}
 			}
 		}
