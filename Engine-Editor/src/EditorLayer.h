@@ -44,6 +44,8 @@ namespace Engine {
 
 		glm::vec2 m_ViewportSize = { 0.0f,0.0f };
 
+		int m_GizmoType = -1;
+
 		//panel
 		SceneHierarchyPanel m_SceneHierarchyPanel;
 	};

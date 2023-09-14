@@ -2,10 +2,14 @@
 #include "Engine/Scene/SceneSerializer.h"
 #include "Engine/Ulit/PlatformUtil.h"
 
+#include "Engine/Math/Math.h"
+
 #include <imgui.h>
+#include <ImGuizmo.h>
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
 
 namespace Engine {
 
@@ -197,7 +201,7 @@ namespace Engine {
 		ImGui::Begin("ViewPort");
 		m_ViewportFocused = ImGui::IsWindowFocused();
 		m_ViewportHovered = ImGui::IsWindowHovered();
-		Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused || !m_ViewportHovered);
+		Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused && !m_ViewportHovered);
 		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 
 		if (m_ViewportSize != *(glm::vec2*)&viewportPanelSize && viewportPanelSize.x>0 && viewportPanelSize.y>0) {
@@ -207,8 +211,40 @@ namespace Engine {
 			m_CameraController.OnResize(m_ViewportSize.x, m_ViewportSize.y);
 		}
 
-		uint32_t textureID = m_FrameBuffer->GetColorAttachmentRendererID();
+		uint64_t textureID = m_FrameBuffer->GetColorAttachmentRendererID();
 		ImGui::Image((void*)textureID, ImVec2{ m_ViewportSize.x,m_ViewportSize.y }, ImVec2{ 0,1 }, ImVec2{ 1,0 });
+
+		Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
+		if (selectedEntity && m_GizmoType != -1) {
+			ImGuizmo::SetOrthographic(false);
+			ImGuizmo::SetDrawlist();
+
+			float windowWidth = (float)ImGui::GetWindowWidth();
+			float windowHeight = (float)ImGui::GetWindowHeight();
+			ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+
+			auto cameraEntity = m_ActiveScene->GetPrimaryCameraEntity();
+			const auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
+			const  glm::mat4& cameraProjection = camera.GetProjection();
+			glm::mat4 cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform());
+
+			auto& tc = selectedEntity.GetComponent<TransformComponent>();
+			glm::mat4 transform = tc.GetTransform();
+
+			ImGuizmo::Manipulate(glm::value_ptr(cameraView), glm::value_ptr(cameraProjection),
+				(ImGuizmo::OPERATION)m_GizmoType, ImGuizmo::LOCAL, glm::value_ptr(transform));
+			if (ImGuizmo::IsUsing()) {
+
+				glm::vec3 translation, rotation, scale;
+				Math::DecomposeTransform(transform, translation, rotation, scale);
+				tc.Translation = glm::vec3(transform[3]);
+
+				glm::vec3 deltaRotation = rotation - tc.Rotation;
+				tc.Rotation += deltaRotation;
+				tc.Scale = scale;
+			}
+		}
+
 		ImGui::End();
 		ImGui::PopStyleVar();
 
@@ -248,8 +284,23 @@ namespace Engine {
 		{
 			if (control && shift)
 				SaveSceneAs();
+			else
+				m_GizmoType = ImGuizmo::OPERATION::SCALE;
 			break;
 		}
+
+		//gizmo shortcuts
+
+		case EG_KEY_R:
+			m_GizmoType = ImGuizmo::OPERATION::ROTATE;
+			break;
+		case EG_KEY_G:
+			m_GizmoType = ImGuizmo::OPERATION::TRANSLATE;
+			break;
+		case EG_KEY_Q:
+			m_GizmoType = -1;
+			break;
+		
 		}
 	}
 

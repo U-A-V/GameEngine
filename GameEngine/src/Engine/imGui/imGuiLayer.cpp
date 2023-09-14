@@ -8,7 +8,9 @@
 #include "Engine/Core/Application.h"
 
 #include <GLFW/glfw3.h>
-#include "glad/glad.h"
+#include <glad/glad.h>
+
+#include <ImGuizmo.h>
 
 namespace Engine {
 	imGuiLayer::imGuiLayer() 
@@ -75,6 +77,7 @@ namespace Engine {
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
+		ImGuizmo::BeginFrame();
 	}
 	void imGuiLayer::End() {
 		EG_PROFILE_FUNCTION();
