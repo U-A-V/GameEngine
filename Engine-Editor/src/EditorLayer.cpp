@@ -30,6 +30,8 @@ namespace Engine {
 		m_FrameBuffer = FrameBuffer::Create(fbSpec);
 	
 		m_ActiveScene = CreateRef<Scene>();
+		m_EditorCamera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
+#if 0
 		auto square = m_ActiveScene->CreateEntity("Green Square");
 
 		square.AddComponent<SpriteRendererComponent>( glm::vec4{ 0.0f,1.0f,0.0f,1.0f });
@@ -71,11 +73,9 @@ namespace Engine {
 			}
 		};
 		m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
+#endif
 
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
-
-		SceneSerializer serializer(m_ActiveScene);
-		serializer.Serialize("assets/scenes/example.engine");
 	}
 
 	void EditorLayer::OnDetach()
@@ -92,14 +92,17 @@ namespace Engine {
 		if (FrameBufferSpecification spec = m_FrameBuffer->GetSpecification();
 			m_ViewportSize.x > 0.0f && m_ViewportSize.y > 0.0f &&
 			(spec.Width != m_ViewportSize.x || spec.Height != m_ViewportSize.y)) {
+
 			m_FrameBuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 			m_CameraController.OnResize(m_ViewportSize.x, m_ViewportSize.y);
-
+			m_EditorCamera.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
 			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x , (uint32_t)m_ViewportSize.y);
 		}
 
-		if(m_ViewportFocused)
+		if (m_ViewportFocused) {
 			m_CameraController.OnUpdate(ts);
+			m_EditorCamera.OnUpdate(ts);
+		}
 		
 		Renderer2D::ResetStats();
 		m_FrameBuffer->Bind();
@@ -107,15 +110,9 @@ namespace Engine {
 		RenderCommand::Clear();
 
 	#if 1
-		static float rotation = 0.0f;
-		rotation += ts * 2.0f;
-
-		Renderer2D::BeginScene(m_CameraController.GetCamera());
-
-		m_ActiveScene->OnUpdate(ts);
-
-		Renderer2D::EndScene();
-
+		//update scene
+		m_ActiveScene->OnUpdateEditor(ts, m_EditorCamera);
+		//m_ActiveScene->OnUpdateRuntime(ts);
 
 		m_FrameBuffer->Unbind();
 	#endif
@@ -204,15 +201,12 @@ namespace Engine {
 		Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused && !m_ViewportHovered);
 		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 
-		if (m_ViewportSize != *(glm::vec2*)&viewportPanelSize && viewportPanelSize.x>0 && viewportPanelSize.y>0) {
 
-			m_FrameBuffer->Resize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 			m_ViewportSize = { viewportPanelSize.x,viewportPanelSize.y };
-			m_CameraController.OnResize(m_ViewportSize.x, m_ViewportSize.y);
-		}
+
 
 		uint64_t textureID = m_FrameBuffer->GetColorAttachmentRendererID();
-		ImGui::Image((void*)textureID, ImVec2{ m_ViewportSize.x,m_ViewportSize.y }, ImVec2{ 0,1 }, ImVec2{ 1,0 });
+		ImGui::Image(reinterpret_cast<void*>(textureID), ImVec2{ m_ViewportSize.x,m_ViewportSize.y }, ImVec2{ 0,1 }, ImVec2{ 1,0 });
 
 		Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
 		if (selectedEntity && m_GizmoType != -1) {
@@ -223,11 +217,17 @@ namespace Engine {
 			float windowHeight = (float)ImGui::GetWindowHeight();
 			ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
 
-			auto cameraEntity = m_ActiveScene->GetPrimaryCameraEntity();
-			const auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
-			const  glm::mat4& cameraProjection = camera.GetProjection();
-			glm::mat4 cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform());
+			//camera
 
+			//auto cameraEntity = m_ActiveScene->GetPrimaryCameraEntity();
+			//const auto& camera = cameraEntity.GetComponent<CameraComponent>().Camera;
+			//const  glm::mat4& cameraProjection = camera.GetProjection();
+			//glm::mat4 cameraView = glm::inverse(cameraEntity.GetComponent<TransformComponent>().GetTransform());
+
+			const glm::mat4& cameraProjection = m_EditorCamera.GetProjection();
+			glm::mat4 cameraView = m_EditorCamera.GetViewMatrix();
+
+			//entity transform
 			auto& tc = selectedEntity.GetComponent<TransformComponent>();
 			glm::mat4 transform = tc.GetTransform();
 
@@ -256,7 +256,7 @@ namespace Engine {
 	void EditorLayer::OnEvent(Event& e)
 	{
 		m_CameraController.OnEvent(e);
-
+		m_EditorCamera.OnEvent(e);
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<KeyPressedEvent>(EG_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
 	}

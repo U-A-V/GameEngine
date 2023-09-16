@@ -28,7 +28,19 @@ namespace Engine {
 	void Scene::DestroyEntity(Entity entity) {
 		m_Registry.destroy(entity);
 	}
-	void Scene::OnUpdate(TimeStamp ts) {
+	void Scene::OnUpdateEditor(TimeStamp ts, EditorCamera& camera) {
+		Renderer2D::BeginScene(camera);
+		auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
+		for (auto entity : group) {
+			auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
+
+			Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color);
+		}
+
+		Renderer2D::EndScene();
+	}
+
+	void Scene::OnUpdateRuntime(TimeStamp ts) {
 		//update scripts
 		{
 			m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc) {
@@ -42,21 +54,21 @@ namespace Engine {
 		}
 		//Render 2D
 		Camera* mainCamera = nullptr;
-		glm::mat4* cameraTransform = nullptr;
+		glm::mat4 cameraTransform;
 		{
 			auto view = m_Registry.group<CameraComponent>(entt::get<TransformComponent>);
 			for (auto entity : view) {
 				auto [camera, transform] = m_Registry.get<CameraComponent, TransformComponent>(entity);
 				if (camera.Primary) {
 					mainCamera = &camera.Camera;
-					cameraTransform = &transform.GetTransform();
+					cameraTransform = transform.GetTransform();
 					break;
 				}
 			}
 		}
 
 		if (mainCamera) {
-			Renderer2D::BeginScene(mainCamera->GetProjection(), *cameraTransform);
+			Renderer2D::BeginScene(mainCamera->GetProjection(), cameraTransform);
 			auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
 			for (auto entity : group) {
 				auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);

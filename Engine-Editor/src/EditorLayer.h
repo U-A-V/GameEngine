@@ -2,6 +2,8 @@
 #include "Engine.h"
 #include "Panel/SceneHierarchyPanel.h"
 
+#include "Engine/Renderer/EditorCamera.h"
+
 namespace Engine {
 
 
@@ -36,6 +38,8 @@ namespace Engine {
 		Entity m_SquareEntity;
 		Entity m_CameraEntity;
 		Entity m_SecondaryCamera;
+
+		EditorCamera m_EditorCamera;
 
 		bool m_PrimaryCamera = true;
 		bool m_ViewportFocused = false;

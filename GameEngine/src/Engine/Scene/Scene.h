@@ -1,6 +1,7 @@
 #pragma once
 #include "entt.hpp"
 #include "Engine/Core/TimeStamp.h"
+#include "Engine/Renderer/EditorCamera.h"
 
 namespace Engine {
 	class Entity;
@@ -12,7 +13,8 @@ namespace Engine {
 		Entity CreateEntity(const std::string& name = std::string());
 		void DestroyEntity(Entity entity);
 
-		void OnUpdate(TimeStamp ts);
+		void OnUpdateEditor(TimeStamp ts, EditorCamera& camera);
+		void OnUpdateRuntime(TimeStamp ts);
 		void OnViewportResize(uint32_t width, uint32_t height);
 
 		Entity GetPrimaryCameraEntity();
