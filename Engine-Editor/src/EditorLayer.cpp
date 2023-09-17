@@ -24,6 +24,7 @@ namespace Engine {
 		m_Texture = Texture2D::Create("assets/textures/Checkerboard.png");
 
 		FrameBufferSpecification fbSpec;
+		fbSpec.Attachments = { FrameBufferTextureFormat::RGBA8, FrameBufferTextureFormat::Depth };
 		fbSpec.Width = 1280;
 		fbSpec.Height = 720;
 
@@ -31,49 +32,6 @@ namespace Engine {
 	
 		m_ActiveScene = CreateRef<Scene>();
 		m_EditorCamera = EditorCamera(30.0f, 1.778f, 0.1f, 1000.0f);
-#if 0
-		auto square = m_ActiveScene->CreateEntity("Green Square");
-
-		square.AddComponent<SpriteRendererComponent>( glm::vec4{ 0.0f,1.0f,0.0f,1.0f });
-
-		auto redSquare = m_ActiveScene->CreateEntity("Red Square");
-
-		redSquare.AddComponent<SpriteRendererComponent>( glm::vec4{ 1.0f,0.0f,0.0f,1.0f });
-
-
-
-		m_SquareEntity = square;
-
-		m_CameraEntity = m_ActiveScene->CreateEntity("Camera A");
-		m_CameraEntity.AddComponent<CameraComponent>();
-
-		m_SecondaryCamera = m_ActiveScene->CreateEntity("Camera B");
-		auto& cc = m_SecondaryCamera.AddComponent<CameraComponent>();
-		cc.Primary = false;
-
-		class CameraController : public ScriptableEntity {
-		public:
-			void OnCreate() {
-				//std::cout << "Camera:oncreate!!" << std::endl;
-			}
-			void OnDestroy(){}
-			void OnUpdate(TimeStamp ts) {
-				auto& translation = GetComponent<TransformComponent>().Translation;
-				float speed = 5.0f;
-				if (Input::IsKeyPressed(EG_KEY_A))
-					translation.x -= speed * ts;
-				if (Input::IsKeyPressed(EG_KEY_D))
-					translation.x += speed * ts;
-				if (Input::IsKeyPressed(EG_KEY_W))
-					translation.y += speed * ts;
-				if (Input::IsKeyPressed(EG_KEY_S))
-					translation.y -= speed * ts;
-				//std::cout << "Timestep: " << ts << std::endl;
-
-			}
-		};
-		m_CameraEntity.AddComponent<NativeScriptComponent>().Bind<CameraController>();
-#endif
 
 		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 	}
