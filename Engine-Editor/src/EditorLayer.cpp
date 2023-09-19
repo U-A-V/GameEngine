@@ -24,7 +24,7 @@ namespace Engine {
 		m_Texture = Texture2D::Create("assets/textures/Checkerboard.png");
 
 		FrameBufferSpecification fbSpec;
-		fbSpec.Attachments = { FrameBufferTextureFormat::RGBA8, FrameBufferTextureFormat::Depth };
+		fbSpec.Attachments = { FrameBufferTextureFormat::RGBA8, FrameBufferTextureFormat::RED_INTEGER,  FrameBufferTextureFormat::Depth };
 		fbSpec.Width = 1280;
 		fbSpec.Height = 720;
 
@@ -67,10 +67,30 @@ namespace Engine {
 		RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 		RenderCommand::Clear();
 
+		//clear our entityID attachement to -1
+		m_FrameBuffer->ClearColorAttachment(1, -1);
+
 	#if 1
 		//update scene
 		m_ActiveScene->OnUpdateEditor(ts, m_EditorCamera);
 		//m_ActiveScene->OnUpdateRuntime(ts);
+
+		auto [mx, my] = ImGui::GetMousePos();
+		mx -= m_ViewportBounds[0].x;
+		my -= m_ViewportBounds[0].y;
+
+		glm::vec2 viewportSize = m_ViewportBounds[1] - m_ViewportBounds[0];
+		my = viewportSize.y-25.0f - my;
+
+		int mouseX = int(mx);
+		int mouseY = int(my);
+
+		if (mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)viewportSize.y) {
+			int pixelData = m_FrameBuffer->ReadPixel(1, mouseX, mouseY);
+			EG_CORE_WARN("pixelData: {0}",pixelData);
+
+		}
+
 
 		m_FrameBuffer->Unbind();
 	#endif
@@ -154,18 +174,31 @@ namespace Engine {
 
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0,0 });
 		ImGui::Begin("ViewPort");
+		auto viewportOffset = ImGui::GetCursorPos(); //includes the tab bar
+
 		m_ViewportFocused = ImGui::IsWindowFocused();
 		m_ViewportHovered = ImGui::IsWindowHovered();
 		Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused && !m_ViewportHovered);
+
 		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+		m_ViewportSize = { viewportPanelSize.x,viewportPanelSize.y };
 
-
-			m_ViewportSize = { viewportPanelSize.x,viewportPanelSize.y };
-
-
-		uint64_t textureID = m_FrameBuffer->GetColorAttachmentRendererID();
+		uint64_t textureID = m_FrameBuffer->GetColorAttachmentRendererID(0);
 		ImGui::Image(reinterpret_cast<void*>(textureID), ImVec2{ m_ViewportSize.x,m_ViewportSize.y }, ImVec2{ 0,1 }, ImVec2{ 1,0 });
 
+		auto windowSize = ImGui::GetWindowSize();
+		ImVec2 minBound = ImGui::GetWindowPos();
+		minBound.x += viewportOffset.x;
+		minBound.y += viewportOffset.y;
+
+		ImVec2 maxBound = { minBound.x + windowSize.x, minBound.y + windowSize.y };
+		m_ViewportBounds[0] = { minBound.x, minBound.y };
+		m_ViewportBounds[1] = { maxBound.x, maxBound.y };
+
+		//EG_CORE_WARN("Min Bounds = {0}, {1}", m_ViewportBounds[0].x, m_ViewportBounds[0].y);
+		//EG_CORE_WARN("Max Bounds = {0}, {1}", m_ViewportBounds[1].x, m_ViewportBounds[1].y);
+
+		//Gizmo
 		Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
 		if (selectedEntity && m_GizmoType != -1) {
 			ImGuizmo::SetOrthographic(false);
