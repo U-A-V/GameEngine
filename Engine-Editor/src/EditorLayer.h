@@ -38,6 +38,7 @@ namespace Engine {
 		Entity m_SquareEntity;
 		Entity m_CameraEntity;
 		Entity m_SecondaryCamera;
+		Entity m_HoveredEntity;
 
 		EditorCamera m_EditorCamera;
 
