@@ -253,6 +253,7 @@ namespace Engine {
 		m_EditorCamera.OnEvent(e);
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<KeyPressedEvent>(EG_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
+		dispatcher.Dispatch<MouseButtonPressedEvent>(EG_BIND_EVENT_FN(EditorLayer::OnMouseButtonPressed));
 	}
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e) {
 
@@ -298,6 +299,14 @@ namespace Engine {
 		}
 	}
 
+	bool EditorLayer::OnMouseButtonPressed(MouseButtonPressedEvent& e) {
+		if (e.GetMouseButton() == EG_MOUSE_BUTTON_LEFT) {
+			if (m_ViewportHovered && !ImGuizmo::IsOver() && Input::IsKeyPressed(EG_KEY_LEFT_ALT)) {
+				m_SceneHierarchyPanel.SetSelectedEntity(m_HoveredEntity);
+			}
+		}
+		return false;
+	}
 
 	void EditorLayer::NewScene()
 	{
