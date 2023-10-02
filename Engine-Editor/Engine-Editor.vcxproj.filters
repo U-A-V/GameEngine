@@ -7,15 +7,17 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\EditorLayer.h" />
-    <ClInclude Include="src\Panel\SceneHierarchyPanel.h">
+    <ClInclude Include="src\Panels\SceneHierarchyPanel.h">
       <Filter>Panel</Filter>
     </ClInclude>
+    <ClInclude Include="src\Panels\ContentBrowserPanel.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EditorLayer.cpp" />
     <ClCompile Include="src\EngineEditorApp.cpp" />
-    <ClCompile Include="src\Panel\SceneHierarchyPanel.cpp">
+    <ClCompile Include="src\Panels\SceneHierarchyPanel.cpp">
       <Filter>Panel</Filter>
     </ClCompile>
+    <ClCompile Include="src\Panels\ContentBrowserPanel.cpp" />
   </ItemGroup>
 </Project>

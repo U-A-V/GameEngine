@@ -1,6 +1,7 @@
 #pragma once
 #include "Engine.h"
-#include "Panel/SceneHierarchyPanel.h"
+#include "Panels/SceneHierarchyPanel.h"
+#include "Panels/ContentBrowserPanel.h"
 
 #include "Engine/Renderer/EditorCamera.h"
 
@@ -55,5 +56,6 @@ namespace Engine {
 
 		//panel
 		SceneHierarchyPanel m_SceneHierarchyPanel;
+		ContentBrowserPanel m_ContentBrowserPanel;
 	};
 }
