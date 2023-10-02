@@ -9,3 +9,9 @@ bin-int/
 *.user
 
 *.json
+
+
+# Directories
+GameEngine/vendor/VulkanSDK
+GameEngine/assets/cache
+scripts/__pycache__

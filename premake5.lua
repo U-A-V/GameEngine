@@ -1,3 +1,5 @@
+include "Dependencies.lua"
+
 workspace "GameEngine"
     architecture "x64"
     startproject "Engine-Editor"
@@ -9,16 +11,6 @@ workspace "GameEngine"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
-IncludeDir = {}
-IncludeDir["GLFW"] = "GameEngine/vendor/GLFW/include"
-IncludeDir["Glad"] = "GameEngine/vendor/Glad/include"
-IncludeDir["imgui"] = "GameEngine/vendor/imgui"
-IncludeDir["glm"]="GameEngine/vendor/glm"
-IncludeDir["stb"]="GameEngine/vendor/stb_image"
-IncludeDir["entt"]="GameEngine/vendor/entt/include"
-IncludeDir["yaml_cpp"]="GameEngine/vendor/yaml-cpp/include"
-IncludeDir["ImGuizmo"]="GameEngine/vendor/ImGuizmo"
-
 include "GameEngine/vendor/GLFW"
 include "GameEngine/vendor/Glad"
 include "GameEngine/vendor/imgui"
@@ -29,7 +21,7 @@ project "GameEngine"
     kind "StaticLib"
     language "C++"
     cppdialect "C++17"
-    staticruntime "on"
+    staticruntime "off"
 
 
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
@@ -60,6 +52,9 @@ project "GameEngine"
         "%{IncludeDir.entt}",
         "%{IncludeDir.yaml_cpp}",
         "%{IncludeDir.ImGuizmo}",
+        "%{IncludeDir.VulkanSDK}",
+        "%{IncludeDir.shaderc}",
+
     }
 
     links{
@@ -85,14 +80,35 @@ project "GameEngine"
         defines "EG_DEBUG"
         symbols "on"
         runtime "Debug"
+        
+		links
+		{
+			"%{Library.ShaderC_Debug}",
+			"%{Library.SPIRV_Cross_Debug}",
+			"%{Library.SPIRV_Cross_GLSL_Debug}"
+		}
     filter "configurations:Release"
         defines "EG_RELEASE"
         optimize "on"
         runtime "Release"
+        
+		links
+		{
+			"%{Library.ShaderC_Release}",
+			"%{Library.SPIRV_Cross_Release}",
+			"%{Library.SPIRV_Cross_GLSL_Release}"
+		}
     filter "configurations:Dist"
         defines "EG_DIST"
         optimize "on"
         runtime "Release"
+        
+		links
+		{
+			"%{Library.ShaderC_Release}",
+			"%{Library.SPIRV_Cross_Release}",
+			"%{Library.SPIRV_Cross_GLSL_Release}"
+		}
         
 
 
@@ -101,7 +117,7 @@ project "Engine-Editor"
     kind "ConsoleApp"
     language "C++"
     cppdialect "C++17"
-    staticruntime "on"
+    staticruntime "off"
 
     targetdir ("bin/" .. outputdir .. "/%{prj.name}")
     objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
@@ -119,7 +135,7 @@ project "Engine-Editor"
         "%{IncludeDir.imgui}",
         "%{IncludeDir.entt}",
         "%{IncludeDir.ImGuizmo}",
-
+        "%{IncludeDir.shaderc}",
     }
 
     links {
