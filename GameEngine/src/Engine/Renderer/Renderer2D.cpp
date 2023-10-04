@@ -457,7 +457,10 @@ namespace Engine {
 	}
 	void Renderer2D::DrawSprite(const glm::mat4& transform, SpriteRendererComponent& sprite, int entityID)
 	{
-		DrawQuad(transform, sprite.Color, entityID);
+		if (sprite.Texture)
+			DrawQuad(transform, sprite.Texture, sprite.TilingFactor, entityID);
+		else
+			DrawQuad(transform, sprite.Color, entityID);
 	}
 	Renderer2D::Statistics Renderer2D::GetStats() {
 		return s_Data.Stats;

@@ -2,7 +2,7 @@
 
 #include "Engine/Scene/SceneCamera.h"
 #include "Engine/Scene/ScriptableEntity.h"
-
+#include "Engine/Renderer/Texture.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
@@ -43,6 +43,8 @@ namespace Engine {
 	struct SpriteRendererComponent {
 
 		glm::vec4 Color{1.0f,1.0f,1.0f,1.0f};
+		float TilingFactor = 1.0f;
+		Ref<Texture2D> Texture;
 
 		SpriteRendererComponent() = default;
 		SpriteRendererComponent(const SpriteRendererComponent&) = default;
