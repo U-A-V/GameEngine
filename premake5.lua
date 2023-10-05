@@ -15,6 +15,7 @@ include "GameEngine/vendor/GLFW"
 include "GameEngine/vendor/Glad"
 include "GameEngine/vendor/imgui"
 include "GameEngine/vendor/yaml-cpp"
+include "GameEngine/vendor/Box2D"
 
 project "GameEngine"
     location "GameEngine"
@@ -44,6 +45,7 @@ project "GameEngine"
     includedirs {
         "%{prj.name}/src",
         "%{prj.name}/vendor/spdlog/include",
+        "%{IncludeDir.Box2D}",
         "%{IncludeDir.GLFW}",
         "%{IncludeDir.Glad}",
         "%{IncludeDir.imgui}",
@@ -58,6 +60,7 @@ project "GameEngine"
     }
 
     links{
+        "Box2D",
         "GLFW",
         "Glad",
         "imgui",

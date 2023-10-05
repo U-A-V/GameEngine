@@ -7,6 +7,7 @@ VULKAN_SDK = os.getenv("VULKAN_SDK")
 IncludeDir = {}
 IncludeDir["stb_image"] = "%{wks.location}/GameEngine/vendor/stb_image"
 IncludeDir["yaml_cpp"] = "%{wks.location}/GameEngine/vendor/yaml-cpp/include"
+IncludeDir["Box2D"] = "%{wks.location}/GameEngine/vendor/Box2D/include"
 IncludeDir["GLFW"] = "%{wks.location}/GameEngine/vendor/GLFW/include"
 IncludeDir["Glad"] = "%{wks.location}/GameEngine/vendor/Glad/include"
 IncludeDir["imgui"] = "%{wks.location}/GameEngine/vendor/imgui"
