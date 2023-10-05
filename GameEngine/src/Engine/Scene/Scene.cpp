@@ -46,7 +46,7 @@ namespace Engine {
 			m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc) {
 				if (!nsc.Instance) {
 					nsc.Instance = nsc.InstantiateScript();
-					nsc.Instance->m_Entity = Entity(entity, this);
+					nsc.Instance->m_Entity = Entity{ entity, this };
 					nsc.Instance->OnCreate();
 				}
 				nsc.Instance->OnUpdate(ts);
@@ -56,9 +56,9 @@ namespace Engine {
 		Camera* mainCamera = nullptr;
 		glm::mat4 cameraTransform;
 		{
-			auto view = m_Registry.group<CameraComponent>(entt::get<TransformComponent>);
+			auto view = m_Registry.view<CameraComponent, TransformComponent>();
 			for (auto entity : view) {
-				auto [camera, transform] = m_Registry.get<CameraComponent, TransformComponent>(entity);
+				auto [camera, transform] = view.get<CameraComponent, TransformComponent>(entity);
 				if (camera.Primary) {
 					mainCamera = &camera.Camera;
 					cameraTransform = transform.GetTransform();
@@ -68,12 +68,12 @@ namespace Engine {
 		}
 
 		if (mainCamera) {
-			Renderer2D::BeginScene(mainCamera->GetProjection(), cameraTransform);
+			Renderer2D::BeginScene(*mainCamera, cameraTransform);
 			auto group = m_Registry.group<TransformComponent>(entt::get<SpriteRendererComponent>);
 			for (auto entity : group) {
 				auto [transform, sprite] = group.get<TransformComponent, SpriteRendererComponent>(entity);
 			
-				Renderer2D::DrawQuad(transform.GetTransform(), sprite.Color, (int)entity);
+				Renderer2D::DrawSprite(transform.GetTransform(), sprite, (int)entity);
 			}
 
 			Renderer2D::EndScene();
