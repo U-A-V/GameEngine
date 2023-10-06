@@ -124,8 +124,10 @@ namespace Engine {
 	{
 	}
 	static void SerializeEntity(YAML::Emitter& out, Entity entity) {
+		EG_CORE_ASSERT(entity.HasComponent<IDComponent>());
+
 		out BEGIN_MAP; //Entity
-		out KEYVAL("Entity" ,"1234567124345"); //Entity id goes here
+		out KEYVAL("Entity" ,entity.GetUUID()); //Entity id goes here
 
 		if (entity.HasComponent<TagComponent>()) {
 			out KEY("TagComponent");

@@ -1,6 +1,7 @@
 #include "hzpch.h"
 
 #include "Engine/Scene/Scene.h"
+#include "Engine/Scene/ScriptableEntity.h"
 #include "Engine/Scene/Components.h"
 #include "Engine/Scene/Entity.h"
 
@@ -35,14 +36,19 @@ namespace Engine {
 	Scene::~Scene() {
 
 	}
-	Entity Scene::CreateEntity(const std::string& name)
-	{
-		Entity entity =  { m_Registry.create(), this };
+	Entity Scene::CreateEntityWithUUID(UUID uuid, const std::string& name) {
+		Entity entity = { m_Registry.create(), this };
+		entity.AddComponent<IDComponent>(uuid);
 		entity.AddComponent<TransformComponent>();
 		auto& tag = entity.AddComponent<TagComponent>();
 		tag.Tag = name.empty() ? "Entity" : name;
 
 		return entity;
+	}
+
+	Entity Scene::CreateEntity(const std::string& name)
+	{
+		return CreateEntityWithUUID(UUID(), name);
 	}
 	void Scene::DestroyEntity(Entity entity) {
 		m_Registry.destroy(entity);
@@ -191,8 +197,13 @@ namespace Engine {
 
 	template<typename T>
 	void Scene::OnComponentAdded(Entity entity, T& component) {
-		static_assert(false);
+		//static_assert(false);
 	}
+	template<>
+	void Scene::OnComponentAdded<IDComponent>(Entity entity, IDComponent& component) {
+
+	}
+
 	template<>
 	void Scene::OnComponentAdded<TagComponent>(Entity entity, TagComponent& component) {
 

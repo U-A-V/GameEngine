@@ -1,15 +1,6 @@
 Scene: Untitled
 Entities:
-  - Entity: 1234567124345
-    TagComponent:
-      Tag: Empty Entity
-    TransformComponent:
-      Translation: [-1.45925236, 0.41027844, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    SpriteRendererComponent:
-      Color: [1, 1, 1, 1]
-  - Entity: 1234567124345
+  - Entity: 14455351796550818124
     TagComponent:
       Tag: Empty Entity
     TransformComponent:
@@ -27,3 +18,12 @@ Entities:
         OrthographicFar: 1
       Primary: true
       FixedAspectRatio: false
+  - Entity: 5047481887586038514
+    TagComponent:
+      Tag: Empty Entity
+    TransformComponent:
+      Translation: [-1.45925236, 0.41027844, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    SpriteRendererComponent:
+      Color: [1, 1, 1, 1]
