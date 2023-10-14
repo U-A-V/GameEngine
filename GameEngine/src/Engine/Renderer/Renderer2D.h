@@ -17,6 +17,8 @@ namespace Engine{
 		static void BeginScene(const EditorCamera& camera);
 		static void BeginScene(const OrthographicCamera& camera);
 		static void EndScene();
+		static void StartBatch();
+		static void NextBatch();
 		static void Flush();
 
 		//primitives
@@ -40,6 +42,8 @@ namespace Engine{
 
 		static void DrawSprite(const glm::mat4& transform,SpriteRendererComponent& sprite, int entityID );
 
+		static void DrawCircle(const glm::mat4& transform,glm::vec4& color, float thickness=1.0f,float fade=0.005f, int entityID=-1 );
+
 		//Stats
 		struct Statistics {
 			uint32_t DrawCalls = 0;
@@ -51,6 +55,5 @@ namespace Engine{
 		static Statistics GetStats();
 		static void ResetStats();
 	private:
-		static void FlushandReset();
 	};
 }

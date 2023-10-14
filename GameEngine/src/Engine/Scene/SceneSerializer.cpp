@@ -182,6 +182,18 @@ namespace Engine {
 			out END_MAP;
 		}
 
+		if (entity.HasComponent<CircleRendererComponent>()) {
+			out KEY("CircleRendererComponent");
+			out BEGIN_MAP;
+
+			auto& circleRendererComponent = entity.GetComponent<CircleRendererComponent>();
+			out KEYVAL("Color", circleRendererComponent.Color);
+			out KEYVAL("Thickness", circleRendererComponent.Thickness);
+			out KEYVAL("Fade", circleRendererComponent.Fade);
+			out KEYVAL("Radius", circleRendererComponent.Radius);
+			out END_MAP;
+		}
+
 		if (entity.HasComponent<Rigidbody2DComponent>()) {
 			out KEY("Rigidbody2DComponent");
 			out BEGIN_MAP;
@@ -254,8 +266,7 @@ namespace Engine {
 					name = tagComponent["Tag"].as<std::string>();
 				EG_CORE_TRACE("Deserialized entity with ID = {0}, name = {1}", uuid, name);
 
-				Entity deserializedEntity = m_Scene->CreateEntity(name);
-
+				Entity deserializedEntity = m_Scene->CreateEntityWithUUID(uuid, name);
 				auto transformComponent = entity["TransformComponent"];
 				if (transformComponent) {
 					auto& tc = deserializedEntity.GetComponent<TransformComponent>();
@@ -289,6 +300,16 @@ namespace Engine {
 					auto& src = deserializedEntity.AddComponent<SpriteRendererComponent>();
 					src.Color = spriteRendererComponent["Color"].as<glm::vec4>();
 					EG_CORE_TRACE("Deserialized Sprite component");
+				}
+
+				auto circleRendererComponent = entity["CircleRendererComponent"];
+				if (circleRendererComponent) {
+					auto& src = deserializedEntity.AddComponent<CircleRendererComponent>();
+					src.Color = circleRendererComponent["Color"].as<glm::vec4>();
+					src.Thickness = circleRendererComponent["Thickness"].as<float>();
+					src.Fade = circleRendererComponent["Fade"].as<float>();
+					src.Radius = circleRendererComponent["Radius"].as<float>();
+					EG_CORE_TRACE("Deserialized Circle component");
 				}
 
 				auto rigidbody2DComponent = entity["Rigidbody2DComponent"];

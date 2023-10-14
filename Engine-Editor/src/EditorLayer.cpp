@@ -346,6 +346,13 @@ namespace Engine {
 				m_GizmoType = ImGuizmo::OPERATION::SCALE;
 			break;
 		}
+		//scene commands
+
+		case EG_KEY_D: {
+			if (control)
+				OnDuplicateEntity();
+			break;
+		}
 
 		//gizmo shortcuts
 
@@ -388,11 +395,23 @@ namespace Engine {
 
 	void EditorLayer::OpenScene(const std::filesystem::path& path){
 
-			m_ActiveScene = CreateRef<Scene>();
-			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-			m_SceneHierarchyPanel.SetContext(m_ActiveScene);
-			SceneSerializer serializer(m_ActiveScene);
-			serializer.Deserialize(path.string());
+		if (m_SceneState != SceneState::Edit) {
+			OnSceneStop();
+		}
+		if (path.extension().string() != ".engine") {
+			EG_CLIENT_WARN("Could not load {0}, not a scene file", path.filename().string());
+			return;
+		}
+
+		Ref<Scene> newScene = CreateRef<Scene>();
+		SceneSerializer serializer(newScene);
+		if (serializer.Deserialize(path.string())) {
+			m_EditorScene = newScene;
+			m_EditorScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+			m_SceneHierarchyPanel.SetContext(m_EditorScene);
+
+			m_ActiveScene = m_EditorScene;
+		}
 	}
 
 	void EditorLayer::SaveSceneAs()
@@ -407,11 +426,26 @@ namespace Engine {
 
 	void EditorLayer::OnScenePlay(){
 		m_SceneState = SceneState::Play;
+		m_ActiveScene = Scene::Copy(m_EditorScene);
 		m_ActiveScene->OnRuntimeStart();
+
+		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
 	}
 	void EditorLayer::OnSceneStop(){
 		m_SceneState = SceneState::Edit;
 		m_ActiveScene->OnRuntimeStop();
+		m_ActiveScene = m_EditorScene;
+		m_SceneHierarchyPanel.SetContext(m_ActiveScene);
+
 	}
 
+	void EditorLayer::OnDuplicateEntity() {
+		if (m_SceneState != SceneState::Edit)
+			return;
+
+		Entity selectedEntity = m_SceneHierarchyPanel.GetSelectedEntity();
+		if (selectedEntity) {
+			m_EditorScene->DuplicateEntity(selectedEntity);
+		}
+	}
 }
