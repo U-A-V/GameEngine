@@ -42,7 +42,14 @@ namespace Engine{
 
 		static void DrawSprite(const glm::mat4& transform,SpriteRendererComponent& sprite, int entityID );
 
-		static void DrawCircle(const glm::mat4& transform,glm::vec4& color, float thickness=1.0f,float fade=0.005f, int entityID=-1 );
+		static void DrawCircle(const glm::mat4& transform,const glm::vec4& color, float thickness=1.0f,float fade=0.005f, int entityID=-1 );
+		static void DrawLine(const glm::vec3& p0,const glm::vec3& p1,const glm::vec4& color, int entityID=-1 );
+
+		static float GetLineWidth();
+		static void SetLineWidth(float width);
+
+		static void DrawRect(const glm::vec3& position, const glm::vec2& size, const glm::vec4& color, int entityID);
+		static void DrawRect(const glm::mat4& transform, const glm::vec4& color, int entityID);
 
 		//Stats
 		struct Statistics {

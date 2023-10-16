@@ -22,6 +22,13 @@ namespace Engine {
 		inline static void DrawIndexed(const Ref<VertexArray>& vertexArray, uint32_t count = 0) {
 			s_RendererAPI->DrawIndexed(vertexArray, count);
 		}
+		static void DrawLines(const Ref<VertexArray>& vertexArray, uint32_t vertexCount) {
+			s_RendererAPI->DrawLines(vertexArray, vertexCount);
+		}
+		static void SetLineWidth(float width) {
+			s_RendererAPI->SetLineWidth(width);
+		}
+
 	private:
 		static Scope<RendererAPI> s_RendererAPI;
 	};
