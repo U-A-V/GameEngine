@@ -74,6 +74,7 @@ namespace Engine {
 		}
 		
 		Renderer2D::ResetStats();
+		Renderer3D::ResetStats();
 		m_FrameBuffer->Bind();
 		RenderCommand::SetClearColor({ 0.1f, 0.1f, 0.1f, 1.0f });
 		RenderCommand::Clear();
@@ -191,19 +192,31 @@ namespace Engine {
 
 		m_SceneHierarchyPanel.OnImGuiRender();
 		m_ContentBrowserPanel.OnImGuiRender();
+		m_Renderer3DSettingsPanel.OnImGuiRender();
 
 		ImGui::Begin("Stats");
 		std::string name = "None";
-		if (m_HoveredEntity)
+		UUID enttID = -1;
+		if (m_HoveredEntity) {
 			name = m_HoveredEntity.GetComponent<TagComponent>().Tag;
+			enttID = m_HoveredEntity.GetUUID();
+		}
+			
 		ImGui::Text("Hovered Entity: %s",name.c_str());
+		ImGui::Text("ID: %d", enttID);
 		auto stats = Renderer2D::GetStats();
 		ImGui::Text("Renderer2D Stats:");
 		ImGui::Text("Draw Calls: %d", stats.DrawCalls);
 		ImGui::Text("Quads: %d", stats.QuadCount);
 		ImGui::Text("Vertex Count: %d", stats.GetTotalVertexCount());
 		ImGui::Text("Index Count: %d", stats.GetTotalIndexCount());
-
+		auto stats3d = Renderer3D::GetStats();
+		ImGui::Text("Renderer3D Stats:");
+		ImGui::Text("Draw Calls: %d", stats3d.DrawCalls);
+		ImGui::Text("Cube Count: %d", stats3d.CubeCount);
+		ImGui::Text("Spheres Count: %d", stats3d.SphereCount);
+		ImGui::Text("Vertex Count: %d", stats3d.GetTotalVertexCount());
+		ImGui::Text("Index Count: %d", stats3d.GetTotalIndexCount());
 		ImGui::End();
 
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0,0 });
@@ -306,7 +319,21 @@ namespace Engine {
 		}
 		ImGui::PopStyleVar(2);
 		ImGui::PopStyleColor(3);
+		{
+			static int projectype = 0;
+			ImGui::SameLine();
+			if (ImGui::RadioButton("2D", &projectype, 0)) {
+				m_ProjectionType = ProjectionType::Orthographic;
+				
+			}; ImGui::SameLine();
+
+			if (ImGui::RadioButton("3D", &projectype, 1)) {
+				m_ProjectionType = ProjectionType::Perspective;
+			};
+		}
+
 		ImGui::End();
+
 	}
 
 

@@ -2,6 +2,7 @@
 #include "Engine.h"
 #include "Panels/SceneHierarchyPanel.h"
 #include "Panels/ContentBrowserPanel.h"
+#include "Panels/Renderer3DSettingsPanel.h"
 
 #include "Engine/Renderer/EditorCamera.h"
 
@@ -69,11 +70,16 @@ namespace Engine {
 		};
 
 		SceneState m_SceneState = SceneState::Edit;
+		enum class ProjectionType {
+			Orthographic = 0, Perspective = 1,
 
+		};
+
+		ProjectionType m_ProjectionType = ProjectionType::Orthographic;
 		//panel
 		SceneHierarchyPanel m_SceneHierarchyPanel;
 		ContentBrowserPanel m_ContentBrowserPanel;
-
+		Renderer3DSettingsPanel m_Renderer3DSettingsPanel;
 		//Editor Resources
 		Ref<Texture2D> m_IconPlay, m_IconStop;
 
