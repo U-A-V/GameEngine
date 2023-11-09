@@ -50,7 +50,7 @@ namespace Engine {
 
 	struct SpriteRendererComponent {
 
-		glm::vec4 Color{1.0f,1.0f,1.0f,1.0f};
+		glm::vec4 Color{0.8f,0.8f,0.8f,1.0f};
 		float TilingFactor = 1.0f;
 		Ref<Texture2D> Texture;
 
@@ -62,7 +62,7 @@ namespace Engine {
 
 	struct CircleRendererComponent {
 
-		glm::vec4 Color{1.0f,1.0f,1.0f,1.0f};
+		glm::vec4 Color{0.8f,0.8f,0.8f,1.0f};
 		float Radius = 0.5f;
 		float Thickness = 1.0f;
 		float Fade = 0.005f;
@@ -71,6 +71,29 @@ namespace Engine {
 		CircleRendererComponent(const CircleRendererComponent&) = default;
 	};
 
+	struct CubeRendererComponent {
+		glm::vec4 Color{ 0.8f,0.8f,0.8f,1.0f };
+
+		CubeRendererComponent() = default;
+		CubeRendererComponent(const CubeRendererComponent&) = default;
+		CubeRendererComponent(const glm::vec4& color)
+			:Color(color) {}
+	};
+
+	struct SphereRendererComponent {
+		glm::vec4 Color{ 0.8f, 0.8f, 0.8f, 1.0f };
+		float Radius = 0.5f;
+		int sectorCount = 16;
+		int stackCount = 8;
+
+		SphereRendererComponent() = default;
+		SphereRendererComponent(const SphereRendererComponent&) = default;
+		SphereRendererComponent(const glm::vec4& color)
+			:Color(color) {}
+
+	};
+
+	//Camera
 	struct CameraComponent {
 		SceneCamera Camera;
 		bool Primary = true;
@@ -80,6 +103,22 @@ namespace Engine {
 		CameraComponent(const CameraComponent&) = default;
 
 	};
+
+	//lights
+	struct PointLightComponent {
+		float constant = 1.0f;
+		float linear = 0.5f;
+		float quadratic = 0.5f;
+
+		glm::vec3 ambient = glm::vec3(0.5f);
+		glm::vec3 diffuse = glm::vec3(0.85f);
+		glm::vec3 specular = glm::vec3(0.85f);
+
+		PointLightComponent() = default;
+		PointLightComponent(const PointLightComponent&) = default;
+	};
+
+	//script
 
 	class ScriptableEntity;
 	struct NativeScriptComponent {
@@ -132,5 +171,20 @@ namespace Engine {
 		BoxCollider2DComponent(const BoxCollider2DComponent&) = default;
 	};
 
+	struct CircleCollider2DComponent {
 
+		glm::vec2 Offset = { 0.0f,0.0f };
+		float Radius = 0.5f;
+
+		float Density = 1.0f;
+		float Friction = 0.5f;
+		float Restitution = 0.0f;
+		float RestitutionThreshold = 0.5f;
+
+		//Storage for runtime
+		void* RuntimeFixture = nullptr;
+
+		CircleCollider2DComponent() = default;
+		CircleCollider2DComponent(const CircleCollider2DComponent&) = default;
+	};
 }

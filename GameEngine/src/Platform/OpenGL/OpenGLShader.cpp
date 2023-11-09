@@ -23,6 +23,8 @@ namespace Engine {
 				return GL_VERTEX_SHADER;
 			if (type == "fragment" || type == "pixel")
 				return GL_FRAGMENT_SHADER;
+			if (type == "compute")
+				return GL_COMPUTE_SHADER;
 
 			EG_CORE_ASSERT(false, "Unknown shader type!");
 			return 0;
@@ -34,6 +36,7 @@ namespace Engine {
 			{
 			case GL_VERTEX_SHADER:   return shaderc_glsl_vertex_shader;
 			case GL_FRAGMENT_SHADER: return shaderc_glsl_fragment_shader;
+			case GL_COMPUTE_SHADER:	 return shaderc_glsl_compute_shader;
 			}
 			EG_CORE_ASSERT(false);
 			return (shaderc_shader_kind)0;
@@ -45,6 +48,7 @@ namespace Engine {
 			{
 			case GL_VERTEX_SHADER:   return "GL_VERTEX_SHADER";
 			case GL_FRAGMENT_SHADER: return "GL_FRAGMENT_SHADER";
+			case GL_COMPUTE_SHADER:	 return "GL_COMPUTE_SHADER";
 			}
 			EG_CORE_ASSERT(false);
 			return nullptr;
@@ -69,6 +73,7 @@ namespace Engine {
 			{
 			case GL_VERTEX_SHADER:    return ".cached_opengl.vert";
 			case GL_FRAGMENT_SHADER:  return ".cached_opengl.frag";
+			case GL_COMPUTE_SHADER:  return ".cached_opengl.comp";
 			}
 			EG_CORE_ASSERT(false);
 			return "";
@@ -80,6 +85,7 @@ namespace Engine {
 			{
 			case GL_VERTEX_SHADER:    return ".cached_vulkan.vert";
 			case GL_FRAGMENT_SHADER:  return ".cached_vulkan.frag";
+			case GL_COMPUTE_SHADER:  return ".cached_vulkan.comp";
 			}
 			EG_CORE_ASSERT(false);
 			return "";

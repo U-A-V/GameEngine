@@ -6,6 +6,7 @@
 #include "Engine/Scene/Entity.h"
 
 #include "Engine/Renderer/Renderer2D.h"
+#include "Engine/Renderer/Renderer3D.h"
 
 #include <glm/glm.hpp>
 
@@ -14,6 +15,7 @@
 #include <box2d/b2_body.h>
 #include <box2d/b2_fixture.h>
 #include <box2d/b2_polygon_shape.h>
+#include <box2d/b2_circle_shape.h>
 
 
 namespace Engine {
@@ -75,11 +77,15 @@ namespace Engine {
 
 		CopyComponent<TransformComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
 		CopyComponent<CameraComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
+		CopyComponent<PointLightComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
 		CopyComponent<NativeScriptComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
 		CopyComponent<SpriteRendererComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
 		CopyComponent<CircleRendererComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
+		CopyComponent<CubeRendererComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
+		CopyComponent<SphereRendererComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
 		CopyComponent<Rigidbody2DComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
 		CopyComponent<BoxCollider2DComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
+		CopyComponent<CircleCollider2DComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
 
 		return newScene;
 	}
@@ -135,6 +141,22 @@ namespace Engine {
 				body->CreateFixture(&fixtureDef);
 				
 			}
+			if (entity.HasComponent<CircleCollider2DComponent>()) {
+
+				auto& cc2d = entity.GetComponent<CircleCollider2DComponent>();
+
+				b2CircleShape circleShape;
+				circleShape.m_p.Set(cc2d.Offset.x, cc2d.Offset.y);
+				circleShape.m_radius = cc2d.Radius;
+
+				b2FixtureDef fixtureDef;
+				fixtureDef.shape = &circleShape;
+				fixtureDef.density = cc2d.Density;
+				fixtureDef.friction = cc2d.Friction;
+				fixtureDef.restitution = cc2d.Restitution;
+				fixtureDef.restitutionThreshold = cc2d.RestitutionThreshold;
+				body->CreateFixture(&fixtureDef);
+			}
 		}
 	}
 
@@ -164,6 +186,32 @@ namespace Engine {
 		}
 
 		Renderer2D::EndScene();
+		Renderer3D::BeginScene(camera);
+
+		{
+			auto view = m_Registry.view<TransformComponent, PointLightComponent>();
+			for (auto entity : view) {
+				auto [transform, light] = view.get<TransformComponent, PointLightComponent>(entity);
+				Renderer3D::AddPointLight(transform.GetTransform(), light, (int)entity);
+			}
+		}
+		{
+			auto view = m_Registry.view<TransformComponent, SphereRendererComponent>();
+			for (auto entity : view) {
+				auto [transform, sphere] = view.get<TransformComponent, SphereRendererComponent>(entity);
+
+				Renderer3D::DrawSphere(transform.GetTransform(), sphere, (int)entity);
+			}
+		}
+		{
+			auto view = m_Registry.view<TransformComponent, CubeRendererComponent>();
+			for (auto entity : view) {
+				auto [transform, cube] = view.get<TransformComponent, CubeRendererComponent>(entity);
+
+				Renderer3D::DrawCube(transform.GetTransform(), cube.Color, (int)entity);
+			}
+		}
+		Renderer3D::EndScene();
 	}
 
 	void Scene::OnUpdateRuntime(TimeStamp ts) {
@@ -259,11 +307,15 @@ namespace Engine {
 		Entity newEntity = CreateEntity(entity.GetName());
 		CopyComponentIfExists<TransformComponent>(newEntity, entity);
 		CopyComponentIfExists<CameraComponent>(newEntity, entity);
+		CopyComponentIfExists<PointLightComponent>(newEntity, entity);
 		CopyComponentIfExists<NativeScriptComponent>(newEntity, entity);
 		CopyComponentIfExists<SpriteRendererComponent>(newEntity, entity);
+		CopyComponentIfExists<CubeRendererComponent>(newEntity, entity);
+		CopyComponentIfExists<SphereRendererComponent>(newEntity, entity);
 		CopyComponentIfExists<CircleRendererComponent>(newEntity, entity);
 		CopyComponentIfExists<Rigidbody2DComponent>(newEntity, entity);
 		CopyComponentIfExists<BoxCollider2DComponent>(newEntity, entity);
+		CopyComponentIfExists<CircleCollider2DComponent>(newEntity, entity);
 
 	}
 
@@ -302,6 +354,12 @@ namespace Engine {
 		if (m_ViewportWidth > 0 && m_ViewportHeight > 0)
 			component.Camera.SetViewportSize(m_ViewportWidth, m_ViewportHeight);
 	}
+	
+
+	template<>
+	void Scene::OnComponentAdded<PointLightComponent>(Entity entity, PointLightComponent& component) {
+
+	}
 
 	template<>
 	void Scene::OnComponentAdded<SpriteRendererComponent>(Entity entity, SpriteRendererComponent& component) {
@@ -310,6 +368,17 @@ namespace Engine {
 
 	template<>
 	void Scene::OnComponentAdded<CircleRendererComponent>(Entity entity, CircleRendererComponent& component) {
+
+	}
+
+	template<>
+	void Scene::OnComponentAdded<CubeRendererComponent>(Entity entity, CubeRendererComponent& component) {
+
+	}
+	
+
+	template<>
+	void Scene::OnComponentAdded<SphereRendererComponent>(Entity entity, SphereRendererComponent& component) {
 
 	}
 
@@ -325,6 +394,11 @@ namespace Engine {
 
 	template<>
 	void Scene::OnComponentAdded<BoxCollider2DComponent>(Entity entity, BoxCollider2DComponent& component) {
+
+	}
+
+	template<>
+	void Scene::OnComponentAdded<CircleCollider2DComponent>(Entity entity, CircleCollider2DComponent& component) {
 
 	}
 }
