@@ -216,6 +216,21 @@ namespace Engine {
 
 			out END_MAP;
 		}
+
+		if (entity.HasComponent<CircleCollider2DComponent>()) {
+			out KEY("CircleCollider2DComponent");
+			out BEGIN_MAP;
+			auto& cc2dComponent = entity.GetComponent<CircleCollider2DComponent>();
+			out KEYVAL("Offset", cc2dComponent.Offset);
+			out KEYVAL("Radius", cc2dComponent.Radius);
+			out KEYVAL("Density", cc2dComponent.Density);
+			out KEYVAL("Friction", cc2dComponent.Friction);
+			out KEYVAL("Restitution", cc2dComponent.Restitution);
+			out KEYVAL("RestitutionThreshold", cc2dComponent.RestitutionThreshold);
+
+			out END_MAP;
+		}
+
 		out END_MAP;
 	}
 	void SceneSerializer::Serialize(const std::string& filepath)
@@ -331,6 +346,20 @@ namespace Engine {
 					src.Restitution = bc2dComponent["Restitution"].as<float>();
 					src.RestitutionThreshold = bc2dComponent["RestitutionThreshold"].as<float>();
 					EG_CORE_TRACE("Deserialized BoxCollider2D Component");
+
+				}
+
+				auto cc2dComponent = entity["CircleCollider2DComponent"];
+				if (cc2dComponent) {
+					auto& src = deserializedEntity.AddComponent<CircleCollider2DComponent>();
+
+					src.Offset = cc2dComponent["Offset"].as<glm::vec2>();
+					src.Radius = cc2dComponent["Radius"].as<float>();
+					src.Density = cc2dComponent["Density"].as<float>();
+					src.Friction = cc2dComponent["Friction"].as<float>();
+					src.Restitution = cc2dComponent["Restitution"].as<float>();
+					src.RestitutionThreshold = cc2dComponent["RestitutionThreshold"].as<float>();
+					EG_CORE_TRACE("Deserialized CircleCollider2D Component");
 
 				}
 			}

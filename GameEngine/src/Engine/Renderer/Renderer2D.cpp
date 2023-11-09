@@ -58,6 +58,12 @@ namespace Engine {
 		QuadVertex* QuadVertexBufferBase = nullptr;
 		QuadVertex* QuadVertexBufferPtr = nullptr;
 
+		//grid
+		Ref<VertexArray> GridVertexArray;
+		Ref<VertexBuffer> GridVertexBuffer;
+		Ref<Texture2D> GridTexture;
+
+
 		//Circle
 		Ref<VertexArray> CircleVertexArray;
 		Ref<VertexBuffer> CircleVertexBuffer;
@@ -134,6 +140,38 @@ namespace Engine {
 		Ref<IndexBuffer> quadIB = IndexBuffer::Create(quadIndices, s_Data.MaxIndices);
 		s_Data.QuadVertexArray->SetIndexBuffer(quadIB);
 
+		//grid
+		s_Data.GridVertexArray = VertexArray::Create();
+		s_Data.GridVertexBuffer = VertexBuffer::Create(sizeof(QuadVertex) * 4);
+
+		s_Data.GridVertexBuffer->SetLayout({
+			{ShaderDataType::Float3,	"a_Position"},
+			{ShaderDataType::Float4,	"a_Color"},
+			{ShaderDataType::Float2,	"a_TexCoord"},
+			{ShaderDataType::Float,		"a_TexIndex"},
+			{ShaderDataType::Float,		"a_TilingFactor"},
+			{ShaderDataType::Int,		"a_EntityID"},
+		});
+		s_Data.GridVertexArray->AddVertexBuffer(s_Data.GridVertexBuffer);
+
+		uint32_t gridIndex[6] = {
+			0,	1,	2,
+			2,	3,	0
+		};
+
+		Ref<IndexBuffer> gridIB = IndexBuffer::Create(gridIndex, 6);
+		s_Data.GridVertexArray->SetIndexBuffer(gridIB);
+
+
+		uint32_t gridVertices[13*4] = {
+			-100.0f,0.0f,-100.0f,	1.0f,	1.0f,	1.0f,	1.0f,	1.0f,	0.0f,	0.0f,	0.0f,	20.0f,	-1,
+			100.0f,	0.0f,-100.0f,	1.0f,	1.0f,	1.0f,	1.0f,	1.0f,	1.0f,	0.0f,	0.0f,	20.0f,	-1,
+			100.0f,	0.0f,100.0f,	1.0f,	1.0f,	1.0f,	1.0f,	1.0f,	1.0f,	1.0f,	0.0f,	20.0f,	-1,
+			-100.0f,0.0f,100.0f,	1.0f,	1.0f,	1.0f,	1.0f,	1.0f,	0.0f,	1.0f,	0.0f,	20.0f,	-1
+		};
+		s_Data.GridVertexBuffer->SetData(gridVertices, 13 * 4 * sizeof(float));
+		s_Data.GridTexture = Texture2D::Create("assets/textures/grid-png-43559.png");
+
 		//Circles
 		s_Data.CircleVertexArray = VertexArray::Create();
 
@@ -149,7 +187,6 @@ namespace Engine {
 		s_Data.CircleVertexArray->AddVertexBuffer(s_Data.CircleVertexBuffer);
 		s_Data.CircleVertexArray->SetIndexBuffer(quadIB); //use quadIB
 		s_Data.CircleVertexBufferBase = new CircleVertex[s_Data.MaxVertices];
-
 
 		//Lines
 		s_Data.LineVertexArray = VertexArray::Create();
@@ -237,6 +274,11 @@ namespace Engine {
 	}
 	void Renderer2D::Flush()
 	{
+		s_Data.GridTexture->Bind(0);
+		s_Data.QuadShader->Bind();
+		RenderCommand::DrawIndexed(s_Data.GridVertexArray, 6);
+		s_Data.Stats.DrawCalls++;
+
 		if (s_Data.QuadIndexCount) {
 
 			uint32_t dataSize = (uint8_t*)s_Data.QuadVertexBufferPtr - (uint8_t*)s_Data.QuadVertexBufferBase;

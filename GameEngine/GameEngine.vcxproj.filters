@@ -1483,6 +1483,9 @@
       <Filter>vendor\stb_image</Filter>
     </ClInclude>
     <ClInclude Include="src\Engine\Core\UUID.h" />
+    <ClInclude Include="src\Engine\Renderer\Renderer3D.h" />
+    <ClInclude Include="src\Engine\Renderer\3DPrimitives\Sphere.h" />
+    <ClInclude Include="src\Platform\OpenGL\OpenGLCubeTexture.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Engine\Core\Application.cpp">
@@ -1606,5 +1609,8 @@
       <Filter>vendor\stb_image</Filter>
     </ClCompile>
     <ClCompile Include="src\Engine\Core\UUID.cpp" />
+    <ClCompile Include="src\Engine\Renderer\Renderer3D.cpp" />
+    <ClCompile Include="src\Engine\Renderer\3DPrimitives\Sphere.cpp" />
+    <ClCompile Include="src\Platform\OpenGL\OpenGLCubeTexture.cpp" />
   </ItemGroup>
 </Project>
