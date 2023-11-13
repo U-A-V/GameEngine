@@ -26,7 +26,8 @@ namespace Engine {
 
 		static void AddPointLight(const glm::mat4& transform, const PointLightComponent& light, int entityID=-1);
 
-		static void AddCubeTextureFace(const std::string& filePath,uint8_t index);
+		static void CreateCubeMap(std::string& path);
+
 		static void SetSkyBoxRenderer(bool canRender);
 
 		struct Statistics {

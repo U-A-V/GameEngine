@@ -17,11 +17,11 @@ namespace Engine{
 		EG_CORE_ASSERT(false, "Unknown RendererAPI");
 		return nullptr;
 	}
-	Ref<Texture2D> Texture2D::Create(const std::string& path) {
+	Ref<Texture2D> Texture2D::Create(const std::string& path, int size) {
 		switch (Renderer::GetAPI()) {
 
 		case RendererAPI::API::None:		EG_CORE_ASSERT(flase, "RendererAPI::None is currently not supported!!"); return nullptr;
-		case RendererAPI::API::OpenGL:		return CreateRef<OpenGLTexture2D>(path);
+		case RendererAPI::API::OpenGL:		return CreateRef<OpenGLTexture2D>(path, size);
 		}
 		EG_CORE_ASSERT(false, "Unknown RendererAPI");
 		return nullptr;
@@ -30,6 +30,14 @@ namespace Engine{
 		switch (Renderer::GetAPI()) {
 		case RendererAPI::API::None:		EG_CORE_ASSERT(flase, "RendererAPI::None is currently not supported!!"); return nullptr;
 		case RendererAPI::API::OpenGL:		return CreateRef<OpenGLCubeTexture>(faces);
+		}
+		EG_CORE_ASSERT(false, "Unknown RendererAPI");
+		return nullptr;
+	}
+	Ref<CubeTexture> CubeTexture::Create(uint32_t size) {
+		switch (Renderer::GetAPI()) {
+		case RendererAPI::API::None:		EG_CORE_ASSERT(flase, "RendererAPI::None is currently not supported!!"); return nullptr;
+		case RendererAPI::API::OpenGL:		return CreateRef<OpenGLCubeTexture>(size);
 		}
 		EG_CORE_ASSERT(false, "Unknown RendererAPI");
 		return nullptr;

@@ -82,6 +82,7 @@ struct VertexOutput
 layout (location = 0) in VertexOutput Input;
 layout (location = 5) in flat int v_EntityID;
  
+layout (binding = 0) uniform samplerCube SkyBox;
 
 vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
 {
@@ -97,9 +98,9 @@ vec3 CalcPointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir)
   			     light.quadratic * (distance * distance));  
 				 
 
-    vec3 ambient  = light.ambient.xyz  * Input.Color.xyz;
-    vec3 diffuse  = light.diffuse.xyz  * diff * Input.Color.xyz;
-    vec3 specular = light.specular.xyz * spec * Input.Color.xyz;
+    vec3 ambient  = light.ambient.xyz;
+    vec3 diffuse  = light.diffuse.xyz  * diff;
+    vec3 specular = light.specular.xyz * spec;
     ambient  *= attenuation;
     diffuse  *= attenuation;
     specular *= attenuation;
@@ -110,10 +111,12 @@ void main(){
 	
 	vec3 norm = normalize(Input.Normal);
 	vec3 viewDir = normalize(u_CameraPosition.xyz - Input.Position);
+	vec3 R = reflect(-viewDir,norm );
+	vec3 tex = texture(SkyBox, R).rgb;
 	vec3 result=vec3(0.0f);
 	for(int i = 0; i < u_NPointlights; i++)
        result += CalcPointLight(u_PointLights[i], norm, Input.Position,viewDir); 
-	color=vec4(result,Input.Color.w);
+	color=vec4(result * tex * Input.Color.xyz,Input.Color.w);
 
 	color2 = v_EntityID;
 }

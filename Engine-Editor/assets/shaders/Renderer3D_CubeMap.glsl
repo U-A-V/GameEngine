@@ -12,7 +12,7 @@ layout(std140,  binding = 0) uniform Camera{
 void main()
 {
     TexCoords = a_Position.xyz;
-    vec4 pos = u_ViewProjection * vec4(a_Position.xyz, 0.01);
+    vec4 pos = u_ViewProjection * vec4(a_Position.xyz, 0.001);
     gl_Position = pos.xyww;
 }  
 

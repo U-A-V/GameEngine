@@ -9,6 +9,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "glad/glad.h"
+#include "stb_image.h"
+
+
 namespace Engine {
 	struct QuadVertex {
 		glm::vec3 Position;
@@ -83,6 +87,11 @@ namespace Engine {
 		LineVertex* LineVertexBufferPtr = nullptr;
 
 		float LineWidth = 2.0f;
+
+		//cubemap
+		Ref<Shader> HDRItoCubeMap;
+		Ref<Texture2D> HDRICubeMap;
+		Ref<CubeTexture> CubeMap;
 
 		std::array<Ref<Texture2D>, MaxTexturesSlots> TexturesSlots;
 		uint32_t TextureSlotIndex = 1; //slot 0 == whiteTexture;
@@ -163,11 +172,11 @@ namespace Engine {
 		s_Data.GridVertexArray->SetIndexBuffer(gridIB);
 
 
-		uint32_t gridVertices[13*4] = {
-			-100.0f,0.0f,-100.0f,	1.0f,	1.0f,	1.0f,	1.0f,	1.0f,	0.0f,	0.0f,	0.0f,	20.0f,	-1,
-			100.0f,	0.0f,-100.0f,	1.0f,	1.0f,	1.0f,	1.0f,	1.0f,	1.0f,	0.0f,	0.0f,	20.0f,	-1,
-			100.0f,	0.0f,100.0f,	1.0f,	1.0f,	1.0f,	1.0f,	1.0f,	1.0f,	1.0f,	0.0f,	20.0f,	-1,
-			-100.0f,0.0f,100.0f,	1.0f,	1.0f,	1.0f,	1.0f,	1.0f,	0.0f,	1.0f,	0.0f,	20.0f,	-1
+		float gridVertices[13 * 4] = {
+			-1.0f,0.0f,-1.0f,	1.0f,	1.0f,	1.0f,	1.0f,	1.0f,	0.0f,	0.0f,	0.0f,	1.0f,	-1,
+			1.0f,	0.0f,-1.0f,	1.0f,	1.0f,	1.0f,	1.0f,	1.0f,	1.0f,	0.0f,	0.0f,	1.0f,	-1,
+			1.0f,	0.0f,1.0f,	1.0f,	1.0f,	1.0f,	1.0f,	1.0f,	1.0f,	1.0f,	0.0f,	1.0f,	-1,
+			-1.0f,0.0f,1.0f,	1.0f,	1.0f,	1.0f,	1.0f,	1.0f,	0.0f,	1.0f,	0.0f,	1.0f,	-1
 		};
 		s_Data.GridVertexBuffer->SetData(gridVertices, 13 * 4 * sizeof(float));
 		s_Data.GridTexture = Texture2D::Create("assets/textures/grid-png-43559.png");
@@ -214,7 +223,6 @@ namespace Engine {
 		s_Data.CircleShader = Shader::Create("assets/shaders/Renderer2D_Circle.glsl");
 		s_Data.LineShader = Shader::Create("assets/shaders/Renderer2D_Line.glsl");
 
-		s_Data.TexturesSlots[0] = s_Data.WhiteTexture;
 
 		s_Data.QuadVertexPositions[0] = { -0.5f,	-0.5f,	0.0f,	1.0f };
 		s_Data.QuadVertexPositions[1] = { 0.5f,		-0.5f,	0.0f,	1.0f };
@@ -222,6 +230,12 @@ namespace Engine {
 		s_Data.QuadVertexPositions[3] = { -0.5f,	0.5f,	0.0f,	1.0f };
 
 		s_Data.CameraUnifromBuffer = UniformBuffer::Create(sizeof(Renderer2DStorage::CameraData), 0);
+
+		
+		Ref<Texture2D> checkBoard =  Texture2D::Create("assets/textures/CheckerBoard.png");
+
+		s_Data.TexturesSlots[0] = s_Data.WhiteTexture;
+
 	}
 	void Renderer2D::Shutdown()
 	{
@@ -274,10 +288,6 @@ namespace Engine {
 	}
 	void Renderer2D::Flush()
 	{
-		s_Data.GridTexture->Bind(0);
-		s_Data.QuadShader->Bind();
-		RenderCommand::DrawIndexed(s_Data.GridVertexArray, 6);
-		s_Data.Stats.DrawCalls++;
 
 		if (s_Data.QuadIndexCount) {
 

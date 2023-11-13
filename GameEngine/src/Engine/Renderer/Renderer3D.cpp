@@ -89,6 +89,7 @@ namespace Engine {
 
 		Renderer3D::Statistics Stats;
 
+		//point Light
 		PointLight PointLightBuffer[100];
 		Ref<UniformBuffer> PointLightUniformBuffer;
 
@@ -99,13 +100,14 @@ namespace Engine {
 			glm::vec4 CameraPosition;
 		};
 		
-		Ref<CubeTexture> CubeTex;
+		//skybox
 		std::vector<std::string> faces = { "","","","","","" };
 		bool RenderSkyBox;
 		Ref<Shader> SkyBoxShader;
 		Ref<VertexArray> SkyboxVertexArray;
 		Ref<VertexBuffer> SkyboxVertexBuffer;
-
+		Ref<Shader> HDRItoCubeMap;
+		Ref<CubeTexture> CubeMap;
 
 		CameraData CameraBuffer;
 		Ref<UniformBuffer> CameraUnifromBuffer;
@@ -187,6 +189,12 @@ namespace Engine {
 			delete[] cubeIndices;
 
 			//SkyBox
+
+			s_R3Data.HDRItoCubeMap = Shader::Create("assets/shaders/HDRI_to_CubeMap.glsl");
+			Ref<Texture2D> HDRTexture = Texture2D::Create("assests/textures/birchwood_4k.hdr");
+			s_R3Data.CubeMap = CubeTexture::Create(1024);
+			HDRTexture->ComputeCubeMap(s_R3Data.CubeMap, s_R3Data.HDRItoCubeMap);
+
 			s_R3Data.SkyboxVertexArray = VertexArray::Create();
 			s_R3Data.SkyboxVertexBuffer = VertexBuffer::Create(sizeof(glm::vec4)*8);
 			s_R3Data.SkyboxVertexBuffer->SetLayout({
@@ -325,18 +333,20 @@ namespace Engine {
 				s_R3Data.SphereVertexBuffer->SetData(s_R3Data.SphereVertexBufferBase, dataSize);
 
 				s_R3Data.SphereShader->Bind();
+				s_R3Data.CubeMap->Bind();
+
 				RenderCommand::DrawIndexed(s_R3Data.SphereVertexArray, s_R3Data.SphereIndexCount);
 				s_R3Data.Stats.DrawCalls++;
 			}
 			if (s_R3Data.RenderSkyBox) {
-				if (CanRender(s_R3Data.faces)) {
-					glDepthFunc(GL_LEQUAL);
-					s_R3Data.SkyBoxShader->Bind();
-					s_R3Data.CubeTex->Bind();
-					RenderCommand::DrawIndexed(s_R3Data.SkyboxVertexArray, 36);
-					s_R3Data.Stats.DrawCalls++;
-					glDepthFunc(GL_LESS);
-				}
+
+				glDepthFunc(GL_LEQUAL);
+				s_R3Data.SkyBoxShader->Bind();
+				s_R3Data.CubeMap->Bind();
+				RenderCommand::DrawIndexed(s_R3Data.SkyboxVertexArray, 36);
+				s_R3Data.Stats.DrawCalls++;
+				glDepthFunc(GL_LESS);
+
 			}
 		}
 		void Renderer3D::NextBatch() {
@@ -398,14 +408,9 @@ namespace Engine {
 			DrawCube(transform, glm::vec4(light.diffuse, 1.0f), entityID);
 
 		}
-
-
-
-		void Renderer3D::AddCubeTextureFace(const std::string& filePath, uint8_t index) {
-			s_R3Data.faces[index] = filePath;
-			if (CanRender(s_R3Data.faces)) {
-				s_R3Data.CubeTex = CubeTexture::Create(s_R3Data.faces);
-			}
+		void Renderer3D::CreateCubeMap(std::string& path) {
+			Ref<Texture2D> HDRTex = Texture2D::Create(path);
+			HDRTex->ComputeCubeMap(s_R3Data.CubeMap, s_R3Data.HDRItoCubeMap);
 		}
 		void Renderer3D::SetSkyBoxRenderer(bool canRender) {
 			s_R3Data.RenderSkyBox = canRender;

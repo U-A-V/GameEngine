@@ -1,17 +1,18 @@
 #pragma once
 
 #include "Engine/Renderer/Texture.h"
-#include <glad/glad.h>
 
 namespace Engine {
 	class OpenGLCubeTexture:public CubeTexture
 	{
 	public:
 		OpenGLCubeTexture(const std::vector<std::string>& faces);
+		OpenGLCubeTexture(uint32_t size);
 		~OpenGLCubeTexture();
 
 
 		virtual uint32_t GetRendererID() const override { return m_RendererID; }
+		virtual uint32_t GetSize() const override { return m_Size; }
 
 		virtual void Bind(uint32_t slot = 0) const override;
 
@@ -24,6 +25,6 @@ namespace Engine {
 	private:
 		uint32_t m_RendererID;
 		std::vector<std::string> m_FilePath = {"","","","","",""};
-
+		uint32_t m_Size;
 	};
 }

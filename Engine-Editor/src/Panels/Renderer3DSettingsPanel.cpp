@@ -43,18 +43,17 @@ namespace Engine {
 			ImGui::Checkbox("Sky Box", &isChecked);
 			if (isChecked) {
 				Renderer3D::SetSkyBoxRenderer(true);
-				for (size_t i = 0; i < 6; i++) {
-					std::string title = "Texture" + std::to_string(i);
-					ImGui::Button(title.c_str(), ImVec2(100.0f, 0.0f));
+
+				std::string title = "HDR";
+				ImGui::Button(title.c_str(), ImVec2(100.0f, 0.0f));
 					if (ImGui::BeginDragDropTarget()) {
-						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {
-							const wchar_t* path = (const wchar_t*)payload->Data;
-							std::filesystem::path texturePath = std::filesystem::path(g_AssetPath) / path;
-							Renderer3D::AddCubeTextureFace( texturePath.string(), i);
-						}
-						ImGui::EndDragDropTarget();
+						if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("CONTENT_BROWSER_ITEM")) {							const wchar_t* path = (const wchar_t*)payload->Data;
+						std::filesystem::path texturePath = std::filesystem::path(g_AssetPath) / path;
+						Renderer3D::CreateCubeMap( texturePath.string());
 					}
+					ImGui::EndDragDropTarget();
 				}
+				
 			}
 			else {
 				Renderer3D::SetSkyBoxRenderer(false);
