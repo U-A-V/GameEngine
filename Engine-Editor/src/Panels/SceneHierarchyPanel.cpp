@@ -2,6 +2,8 @@
 #include "imgui.h"
 #include "imgui_internal.h"
 #include "Engine/Scene/Components.h"
+#include "Engine/Scene/Entity.h"
+#include "Engine/Renderer/Renderer3D.h"
 #include <filesystem>
 #include <glm/gtc/type_ptr.hpp>
 
@@ -239,6 +241,12 @@ namespace Engine {
 					ImGui::CloseCurrentPopup();
 				}
 			}
+			if (!m_SelectionContext.HasComponent<MaterialComponent>()) {
+				if (ImGui::MenuItem("Material")) {
+					m_SelectionContext.AddComponent<MaterialComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+			}
 			if (!m_SelectionContext.HasComponent<Rigidbody2DComponent>()) {
 				if (ImGui::MenuItem("Rigidbody 2D")) {
 					m_SelectionContext.AddComponent<Rigidbody2DComponent>();
@@ -376,17 +384,33 @@ namespace Engine {
 		});
 
 
-		DrawComponent<SphereRendererComponent>("Cube Renderer", entity, [](auto& component) {
+		DrawComponent<SphereRendererComponent>("Sphere Renderer", entity, [&entity](auto& component) {
+			bool update = false;
 			//Color
-			ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
+			update |= ImGui::ColorEdit4("Color", glm::value_ptr(component.Color));
 
 			//attrib
-			ImGui::DragFloat( "Radius",&component.Radius, 0.1f, 0.0f);
-			ImGui::DragInt( "Sector Count",&component.sectorCount, 1, 0);
-			ImGui::DragInt( "Stack Count",&component.stackCount, 1, 0);
+			update |= ImGui::DragFloat( "Radius",&component.Radius, 0.1f, 0.0f);
+			update |= ImGui::DragInt( "Sector Count",&component.sectorCount, 1,2);
+			update |= ImGui::DragInt( "Stack Count",&component.stackCount, 1, 2);
+
+			auto transform = entity.GetComponent<TransformComponent>();
+			auto sphere = entity.GetComponent<SphereRendererComponent>();
+			if (update && !component.batch)	Renderer3D::UpdateSphere(transform.GetTransform(), sphere, (int)entity);
+
 
 		});
+		
+		DrawComponent<MaterialComponent>("Material", entity, [](auto& component) {
+			bool update = false;
+			update |= ImGui::ColorEdit4("Albedo", glm::value_ptr(component.Albedo));
 
+			update |= ImGui::DragFloat("Roughness", &component.Roughness, 0.01f, 0.0f, 1.0f);
+			update |= ImGui::DragFloat("Metallic", &component.Metallic, 0.01f, 0.0f, 1.0f);
+			if (update) Renderer3D::UpdateMaterial(component);
+
+		});
+		
 
 
 		DrawComponent<Rigidbody2DComponent>("Rigidbody 2D", entity, [](auto& component) {

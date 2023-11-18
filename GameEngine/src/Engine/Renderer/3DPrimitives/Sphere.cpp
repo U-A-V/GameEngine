@@ -12,7 +12,7 @@ namespace Engine {
         std::vector<glm::vec4>& VertexPositions,
         std::vector<glm::vec3>& Normals,
         std::vector<glm::vec2>& TexCoords,
-        std::vector<int>& indices){
+        std::vector<uint32_t>& indices){
 
         float x, y, z, xy;                              // vertex position
         float nx, ny, nz, lengthInv = 1.0f / radius;    // vertex normal

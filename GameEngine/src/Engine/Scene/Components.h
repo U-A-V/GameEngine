@@ -10,6 +10,13 @@
 #include <glm/gtx/quaternion.hpp>
 
 namespace Engine {
+	struct MaterialComponent {
+		glm::vec4 Albedo{ 1.0f };
+		float Roughness = 0.5f;
+		float Metallic = 0.5f;
+
+		uint32_t MaterialID = 0;
+	};
 
 	struct IDComponent {
 		UUID ID;
@@ -83,9 +90,9 @@ namespace Engine {
 	struct SphereRendererComponent {
 		glm::vec4 Color{ 0.8f, 0.8f, 0.8f, 1.0f };
 		float Radius = 0.5f;
-		int sectorCount = 16;
-		int stackCount = 8;
-
+		int sectorCount = 32;
+		int stackCount = 16;
+		bool batch = false;
 		SphereRendererComponent() = default;
 		SphereRendererComponent(const SphereRendererComponent&) = default;
 		SphereRendererComponent(const glm::vec4& color)
@@ -106,9 +113,9 @@ namespace Engine {
 
 	//lights
 	struct PointLightComponent {
-		float constant = 1.0f;
-		float linear = 0.5f;
-		float quadratic = 0.5f;
+		float constant = 0.5f;
+		float linear = 0.15f;
+		float quadratic = 0.1f;
 
 		glm::vec3 ambient = glm::vec3(0.5f);
 		glm::vec3 diffuse = glm::vec3(0.85f);
@@ -153,6 +160,7 @@ namespace Engine {
 		Rigidbody2DComponent() = default;
 		Rigidbody2DComponent(const Rigidbody2DComponent&) = default;
 	};
+
 
 
 	struct BoxCollider2DComponent {

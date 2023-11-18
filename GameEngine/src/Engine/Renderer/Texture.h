@@ -1,6 +1,4 @@
 #pragma once
-
-
 namespace Engine {
 	class Shader;
 	class Texture{
@@ -20,7 +18,6 @@ namespace Engine {
 		static Ref<CubeTexture> Create(const std::vector<std::string>& faces);
 		static Ref<CubeTexture> Create(uint32_t size);
 		virtual void SetData(const std::string& filePath, uint8_t index) = 0;
-		virtual bool CanRender() const = 0;
 		virtual uint32_t GetSize() const = 0;
 		virtual std::vector<std::string> GetFilePath() = 0;
 	};

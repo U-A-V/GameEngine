@@ -360,6 +360,12 @@ namespace Engine {
 	void Scene::OnComponentAdded<PointLightComponent>(Entity entity, PointLightComponent& component) {
 
 	}
+	
+
+	template<>
+	void Scene::OnComponentAdded<MaterialComponent>(Entity entity, MaterialComponent& component) {
+
+	}
 
 	template<>
 	void Scene::OnComponentAdded<SpriteRendererComponent>(Entity entity, SpriteRendererComponent& component) {

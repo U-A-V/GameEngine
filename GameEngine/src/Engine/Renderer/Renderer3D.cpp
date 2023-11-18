@@ -13,6 +13,14 @@
 #include <glm/gtc/type_ptr.hpp>
 
 namespace Engine {
+	struct Material {
+		glm::vec4 Albedo{ 1.0f };
+		float Roughness = 1.0f;
+		float Metallic = 0.0f;
+		float padding = 0.0f;
+		float padding1 = 0.0f;
+	};
+
 	struct CubeVertex {
 		glm::vec3 Position;
 		glm::vec4 Color;
@@ -32,6 +40,11 @@ namespace Engine {
 		int EntityID;
 	};
 
+	struct SphereComponent {
+		Ref<VertexArray> SphereVertexArray;
+		uint32_t indexCount;
+	};
+
 	struct PointLight {
 		glm::vec4 Position;
 
@@ -48,7 +61,10 @@ namespace Engine {
 	struct R3Storage {
 
 		static const uint32_t MaxTexturesSlots = 32;
-
+		//materials
+		Material Mat[100];
+		uint32_t MaterialCount = 1;
+		Ref<UniformBuffer> MaterialUniformBuffer;
 		//cubes
 		static const uint32_t MaxCubes = 1000;
 		static const uint32_t MaxVertices = MaxCubes * 8;
@@ -65,6 +81,7 @@ namespace Engine {
 		glm::vec4 CubeVertexPositions[8];
 
 		//sphere
+		std::unordered_map<int, SphereComponent> SphereArray;
 		static const uint32_t sectorCount = 32;
 		static const uint32_t stackCount = 16;
 
@@ -76,7 +93,7 @@ namespace Engine {
 		std::vector<glm::vec4> VertexPositions;
 		std::vector<glm::vec3> Normals;
 		std::vector<glm::vec2> TexCoords;
-		std::vector<int> SphereIndices;
+		std::vector<uint32_t> SphereIndices;
 		uint32_t indexCount = 0;
 
 		Ref<VertexArray> SphereVertexArray;
@@ -116,6 +133,16 @@ namespace Engine {
 		void Renderer3D::Init() {
 			EG_PROFILE_FUNCTION();
 
+			//material 
+
+			s_R3Data.Mat[0].Albedo = glm::vec4(1.0f, 1.0f,1.0f,1.0f);
+			s_R3Data.Mat[0].Roughness = 0.1f;
+			s_R3Data.Mat[0].Metallic = 0.7f;
+
+			s_R3Data.MaterialUniformBuffer = UniformBuffer::Create(sizeof(Material) * 100, 3);
+
+
+			//cube
 			s_R3Data.CubeVertexArray = VertexArray::Create();
 			s_R3Data.CubeVertexBuffer = VertexBuffer::Create(s_R3Data.MaxVertices*sizeof(CubeVertex));
 			s_R3Data.CubeVertexBuffer->SetLayout({
@@ -287,9 +314,9 @@ namespace Engine {
 
 		void Renderer3D::EndScene() {
 			EG_PROFILE_FUNCTION();
-
 			s_R3Data.PointLightUniformBuffer->SetData(&s_R3Data.PointLightBuffer, sizeof(PointLight) * 100);
 			s_R3Data.PointLightCountUniformBuffer->SetData(&s_R3Data.PointLightCount, sizeof(uint32_t));
+			s_R3Data.MaterialUniformBuffer->SetData(&s_R3Data.Mat, sizeof(Material) * 100);
 
 			Flush();
 		}
@@ -338,6 +365,17 @@ namespace Engine {
 				RenderCommand::DrawIndexed(s_R3Data.SphereVertexArray, s_R3Data.SphereIndexCount);
 				s_R3Data.Stats.DrawCalls++;
 			}
+
+			{
+				s_R3Data.SphereShader->Bind();
+				s_R3Data.CubeMap->Bind();
+				for (auto i : s_R3Data.SphereArray) {
+
+					RenderCommand::DrawIndexed(i.second.SphereVertexArray, i.second.indexCount);
+					s_R3Data.Stats.DrawCalls++;
+					s_R3Data.Stats.SphereCount++;
+				}
+			}
 			if (s_R3Data.RenderSkyBox) {
 
 				glDepthFunc(GL_LEQUAL);
@@ -372,9 +410,9 @@ namespace Engine {
 			s_R3Data.Stats.CubeCount++;
 		}
 
-		void Renderer3D::DrawSphere(const glm::mat4& transform, const SphereRendererComponent& sphere, int entityID) {
+		void Renderer3D::DrawBatchSphere(const glm::mat4& transform, const SphereRendererComponent& sphere, int entityID) {
 			EG_PROFILE_FUNCTION();
-			uint32_t vertexCount = (s_R3Data.stackCount+1) * (s_R3Data.sectorCount+1);
+			uint32_t vertexCount = (s_R3Data.stackCount + 1) * (s_R3Data.sectorCount + 1);
 			if (s_R3Data.SphereIndexCount >= s_R3Data.MaxSphereIndices) {
 				NextBatch();
 			}
@@ -391,6 +429,56 @@ namespace Engine {
 			}
 			s_R3Data.Stats.SphereCount++;
 			s_R3Data.SphereIndexCount += s_R3Data.SphereIndices.size();
+		}
+		void Renderer3D::DrawUniqueSphere(const glm::mat4& transform, const SphereRendererComponent& sphere, int entityID) {
+			if (s_R3Data.SphereArray.find(entityID) == s_R3Data.SphereArray.end()) {
+				UpdateSphere(transform, sphere, entityID);
+			}
+		}
+		void Renderer3D::UpdateSphere(const glm::mat4& transform, const SphereRendererComponent& sphere, int entityID) {
+			SphereComponent Sphereunit;
+			std::vector<glm::vec4> VertexPositions;
+			std::vector<glm::vec3> Normals;
+			std::vector<glm::vec2> TexCoords;
+			std::vector<uint32_t> SphereIndices;
+			Sphere::Sphere(sphere.Radius, sphere.sectorCount, sphere.stackCount, Sphereunit.indexCount,
+				VertexPositions, Normals, TexCoords, SphereIndices);
+			Sphereunit.SphereVertexArray = VertexArray::Create();
+			Ref<VertexBuffer> vbuffer = VertexBuffer::Create(VertexPositions.size() * sizeof(SphereVertex));
+			vbuffer->SetLayout({
+				{ShaderDataType::Float3,		"a_Position"},
+				{ShaderDataType::Float4,		"a_Color"},
+				{ShaderDataType::Float3,		"a_Normal"},
+				{ShaderDataType::Float2,		"a_TexCoord"},
+				{ShaderDataType::Float,			"a_TexIndex"},
+				{ShaderDataType::Int,			"a_EntityID"},
+				});
+			Sphereunit.SphereVertexArray->AddVertexBuffer(vbuffer);
+			uint32_t* indices = new uint32_t[SphereIndices.size()];
+			for (uint32_t i = 0; i < SphereIndices.size(); i++) indices[i] = SphereIndices[i];
+			Sphereunit.indexCount = SphereIndices.size();
+			Ref<IndexBuffer> sphereIB = IndexBuffer::Create(indices, SphereIndices.size());
+			Sphereunit.SphereVertexArray->SetIndexBuffer(sphereIB);
+
+			float textureIndex = 0.0f;
+			SphereVertex* SphereVertexBufferBase = new SphereVertex[VertexPositions.size()];
+			SphereVertex* SphereVertexBufferPtr = SphereVertexBufferBase;
+			for (uint32_t i = 0; i < VertexPositions.size(); i++) {
+				SphereVertexBufferPtr->Position = transform * VertexPositions[i];
+				SphereVertexBufferPtr->Color = sphere.Color;
+				SphereVertexBufferPtr->Normal = Normals[i];
+				SphereVertexBufferPtr->TexCoord = TexCoords[i];
+				SphereVertexBufferPtr->TexIndex = textureIndex;
+				SphereVertexBufferPtr->EntityID = entityID;
+				SphereVertexBufferPtr++;
+			}
+			uint32_t dataSize = (uint8_t*)SphereVertexBufferPtr - (uint8_t*)SphereVertexBufferBase;
+			vbuffer->SetData(SphereVertexBufferBase, dataSize);
+			s_R3Data.SphereArray[entityID] = Sphereunit;
+		}
+		void Renderer3D::DrawSphere(const glm::mat4& transform, const SphereRendererComponent& sphere, int entityID) {
+			if (sphere.batch)	DrawBatchSphere(transform, sphere, entityID);
+			else DrawUniqueSphere(transform, sphere, entityID);
 
 		}
 
@@ -408,6 +496,13 @@ namespace Engine {
 			DrawCube(transform, glm::vec4(light.diffuse, 1.0f), entityID);
 
 		}
+
+		void Renderer3D::UpdateMaterial(const MaterialComponent& mat) {
+			s_R3Data.Mat[0].Albedo = mat.Albedo;
+			s_R3Data.Mat[0].Roughness = mat.Roughness;
+			s_R3Data.Mat[0].Metallic = mat.Metallic;
+		}
+
 		void Renderer3D::CreateCubeMap(std::string& path) {
 			Ref<Texture2D> HDRTex = Texture2D::Create(path);
 			HDRTex->ComputeCubeMap(s_R3Data.CubeMap, s_R3Data.HDRItoCubeMap);

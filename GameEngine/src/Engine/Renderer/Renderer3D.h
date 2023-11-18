@@ -21,10 +21,15 @@ namespace Engine {
 		//primitives
 		static void DrawCube(const glm::mat4& transform, const glm::vec4& color, int entityID = -1);
 
-		static void DrawSphere(const glm::mat4& transfomr,const SphereRendererComponent& sphere, int entityID = -1);
+		static void DrawBatchSphere(const glm::mat4& transform, const SphereRendererComponent& sphere, int entityID = -1);
+		static void DrawUniqueSphere(const glm::mat4& transform, const SphereRendererComponent& sphere, int entityID = -1);
+		static void UpdateSphere(const glm::mat4& transform, const SphereRendererComponent& sphere, int entityID = -1);
+		static void DrawSphere(const glm::mat4& transform,const SphereRendererComponent& sphere, int entityID = -1);
 
 
 		static void AddPointLight(const glm::mat4& transform, const PointLightComponent& light, int entityID=-1);
+
+		static void UpdateMaterial(const MaterialComponent& mat);
 
 		static void CreateCubeMap(std::string& path);
 

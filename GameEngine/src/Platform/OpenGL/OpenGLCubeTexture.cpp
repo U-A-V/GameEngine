@@ -58,17 +58,6 @@ namespace Engine {
         m_FilePath[index] = filePath;
     }
 
-    bool OpenGLCubeTexture::CanRender() const {
-        bool res = true;
-        for (size_t i = 0; i < 6; i++) {
-            if (m_FilePath[i] == "") {
-                res = false;
-                break;
-            }
-        }
-        return res;
-    }
-
     std::vector<std::string> OpenGLCubeTexture::GetFilePath() {
         return m_FilePath;
     }
